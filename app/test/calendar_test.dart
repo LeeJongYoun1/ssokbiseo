@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:biseo/data/calendar.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -28,5 +30,11 @@ void main() {
   test('all-day sorted first', () {
     final t = timed('t', DateTime(2026, 11, 6, 9), DateTime(2026, 11, 6, 10));
     expect(titles([t, all('a', 6, 7)]), ['a', 't']);
+  });
+
+  // release(R8)에서 device_calendar 모델 필드명이 바뀌면 캘린더 id가 null → 일정이 항상 비어 보인다
+  test('release keeps device_calendar models from R8 renaming', () {
+    expect(File('android/app/proguard-rules.pro').readAsStringSync(),
+        contains('-keep class com.builttoroam.devicecalendar.** { *; }'));
   });
 }
