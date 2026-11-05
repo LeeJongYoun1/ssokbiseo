@@ -20,6 +20,13 @@ void main() {
     expect(b.geeknews.first.discussUrl, startsWith('https://news.hada.io'));
   });
 
+  test('tax map parsed; missing tolerated', () {
+    final b = Briefing.fromJson(load());
+    expect(b.tax['nts_press']!.first.points, isNotNull);
+    expect(b.tax['sejungilbo']!.first.points, isNull);
+    expect(Briefing.fromJson(load()..remove('tax')).tax, isEmpty);
+  });
+
   test('unknown topic keys ignored', () {
     final j = load();
     (j['news'] as Map)['낚시'] = [

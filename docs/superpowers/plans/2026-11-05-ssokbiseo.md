@@ -52,6 +52,7 @@
   "news": { "경제": [{ "title": "...", "summary": "...", "url": "https://..." }] },
   "advice": { "good": { "friend": "...", "coach": "...", "quote": "...", "action": "..." } },
   "community": { "geeknews": [Item], "ppomppu": [Item], "ruliweb": [Item], "82cook": [Item] }
+  "tax": { "sejungilbo": [Item], "nts_press": [Item], "nts_notice": [Item] }  // 세무 소식, 없으면 빈 목록, discussUrl은 항상 null
   // Item = { "title": "...", "points": 42 또는 null, "summary": "...", "url": "https://...", "discussUrl": "https://..." 또는 null(GeekNews만 값) }
   // 앱은 옛 최상위 "geeknews"도 community.geeknews로 받아들인다
 }

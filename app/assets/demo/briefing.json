@@ -208,5 +208,55 @@
         "discussUrl": null
       }
     ]
+  },
+  "tax": {
+    "sejungilbo": [
+      {
+        "title": "(예시) 세정일보 소식 1",
+        "points": null,
+        "summary": "세정일보 예시 요약이에요",
+        "url": "https://example.com/sejungilbo/1",
+        "discussUrl": null
+      },
+      {
+        "title": "(예시) 세정일보 소식 2",
+        "points": null,
+        "summary": "세정일보 예시 요약이에요",
+        "url": "https://example.com/sejungilbo/2",
+        "discussUrl": null
+      }
+    ],
+    "nts_press": [
+      {
+        "title": "(예시) 국세청 보도자료 소식 1",
+        "points": 121,
+        "summary": "국세청 보도자료 예시 요약이에요",
+        "url": "https://example.com/nts_press/1",
+        "discussUrl": null
+      },
+      {
+        "title": "(예시) 국세청 보도자료 소식 2",
+        "points": 122,
+        "summary": "국세청 보도자료 예시 요약이에요",
+        "url": "https://example.com/nts_press/2",
+        "discussUrl": null
+      }
+    ],
+    "nts_notice": [
+      {
+        "title": "(예시) 국세청 공지사항 소식 1",
+        "points": 81,
+        "summary": "국세청 공지사항 예시 요약이에요",
+        "url": "https://example.com/nts_notice/1",
+        "discussUrl": null
+      },
+      {
+        "title": "(예시) 국세청 공지사항 소식 2",
+        "points": 82,
+        "summary": "국세청 공지사항 예시 요약이에요",
+        "url": "https://example.com/nts_notice/2",
+        "discussUrl": null
+      }
+    ]
   }
 }

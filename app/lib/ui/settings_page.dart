@@ -70,6 +70,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 }),
               ),
           ]),
+          CardShell('세무 소식', [
+            for (final c in kTaxSources)
+              CheckboxListTile(
+                title: Text(c.label, style: const TextStyle(fontSize: 17)),
+                value: _s.taxSources.contains(c.key),
+                onChanged: (v) => setState(() => _s.taxSources = [
+                      for (final k in kTaxSources)
+                        if (k.key == c.key ? v == true : _s.taxSources.contains(k.key)) k.key
+                    ]),
+              ),
+          ]),
           CardShell('커뮤니티', [
             for (final c in kCommunities)
               CheckboxListTile(

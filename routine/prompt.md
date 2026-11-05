@@ -16,7 +16,7 @@ export SSOK_SERVER=https://<your-vercel-app>.vercel.app
 ## 실패 규칙 (가장 중요)
 
 - 1단계 `news-raw` 요청이 실패하거나, 검증이 3번 고쳐도 통과하지 못하면 **`data/briefing.json`을 덮어쓰지 않는다**(어제 파일 그대로 둔다). 커밋·푸시도 하지 않고, 어느 단계에서 왜 실패했는지 오류 요약을 남기고 끝낸다.
-- 커뮤니티 하나를 못 읽으면 그 키를 `[]`로 두고 계속한다.
+- 커뮤니티·세무 소식 출처 하나를 못 읽으면 그 키를 `[]`로 두고 계속한다.
 - 원자료에 없는 제목·링크를 만들지 않는다. 모르면 뺀다.
 - 중간에 쓴 임시 파일은 `data/briefing.json`이 아닌 곳(예: `/tmp/briefing.json`)에 둔다. 검증을 통과한 뒤에만 복사한다.
 
@@ -36,6 +36,11 @@ export SSOK_SERVER=https://<your-vercel-app>.vercel.app
    - `ruliweb`(루리웹): 실시간 베스트 `https://bbs.ruliweb.com/best/all`. 글 줄의 추천수가 points. 어제 글 중 추천 높은 순(목록에 시각만 있으면 오늘 올라온 것은 빼고, 어제 글이 부족하면 있는 만큼만).
    - `82cook`: 자유게시판 `https://www.82cook.com/entiz/enti.php?bn=15`. points = 조회수. 어제 글 중 조회수 높은 순. (RSS는 비어 있어 쓰지 않는다.)
 
+3-1. 세무 소식(`tax` 객체의 키 `sejungilbo`, `nts_press`, `nts_notice`): 글마다 `{ "title", "points": 숫자 또는 null, "summary", "url": 글 주소(https), "discussUrl": null }`. summary는 제목과 글 첫머리 몇 줄만 보고 1~2줄로 쓴다. 각 출처 0~10개. 원자료에 없는 글은 만들지 않는다.
+   - `sejungilbo`(세정일보): RSS `https://www.sejungilbo.com/rss/allArticle.xml`(약 50개, 순위 없음). 어제(KST) 올라온 기사 중 최신 10개. points = null.
+   - `nts_press`(국세청 보도자료): 목록 `https://www.nts.go.kr/nts/na/ntt/selectNttList.do?mi=2201&bbsId=1028`. 줄마다 제목·담당과·날짜(`2026.11.03.`)·조회수. 링크는 `<a ... data-id="1355853" class="nttInfoBtn">`의 data-id로 `https://www.nts.go.kr/nts/na/ntt/selectNttInfo.do?mi=2201&bbsId=1028&nttSn=<data-id>`를 만든다. 최근 7일 글 최대 10개, points = 조회수.
+   - `nts_notice`(국세청 공지사항): 목록 `https://www.nts.go.kr/nts/na/ntt/selectNttList.do?mi=2207&bbsId=1011`, 상세 `...selectNttInfo.do?mi=2207&bbsId=1011&nttSn=<data-id>`. 규칙은 `nts_press`와 같다(7일, 최대 10개, points = 조회수).
+
 4. 조언 20개: 기분 5 × 말투 4. 각각 **2문장 이내**. 오늘 날짜와 요일을 은근히 반영하고, 20개 사이에 같은 말을 반복하지 않는다. 개인정보(일정·위치)는 쓰지 않는다.
    - 기분: `good` 좋음, `tired` 피곤, `worried` 걱정, `down` 우울, `eager` 의욕
    - 말투: `friend` 다정한 친구, `coach` 짧고 힘 있는 코치, `quote` 명언 인용, `action` 오늘 해 볼 작은 행동
@@ -43,7 +48,7 @@ export SSOK_SERVER=https://<your-vercel-app>.vercel.app
 5. 파일 만들기와 올리기
    - 아래 모양으로 JSON을 만든다. `date`는 오늘(KST) `YYYY-MM-DD`, `generatedAt`은 KST ISO 시각(예: `2026-11-06T05:31:00+09:00`).
      ```json
-     { "date": "", "generatedAt": "", "news": { "경제": [] }, "advice": { "good": { "friend": "", "coach": "", "quote": "", "action": "" } }, "community": { "geeknews": [], "ppomppu": [], "ruliweb": [], "82cook": [] } }
+     { "date": "", "generatedAt": "", "news": { "경제": [] }, "advice": { "good": { "friend": "", "coach": "", "quote": "", "action": "" } }, "community": { "geeknews": [], "ppomppu": [], "ruliweb": [], "82cook": [] }, "tax": { "sejungilbo": [], "nts_press": [], "nts_notice": [] } }
      ```
    - `node routine/validate.mjs <파일>`을 실행한다. 오류가 나오면 경로(예: `news.경제[3].url`)를 보고 고쳐서 다시 실행한다. 최대 3번까지 시도한다.
    - 통과하면 `data/briefing.json`으로 복사한 뒤:
@@ -55,4 +60,4 @@ export SSOK_SERVER=https://<your-vercel-app>.vercel.app
      ```
      `git push`가 실패하면 오류를 그대로 보고하고 끝낸다(재시도는 한 번까지만, 무한 반복 금지).
      (YYYY-MM-DD는 오늘 KST 날짜. `main` 푸시는 의도된 배포 방식이다. 앱이 main의 파일을 그대로 읽는다.)
-   - 마지막에 한 줄로 결과를 알린다(뉴스 개수, 커뮤니티별 개수, 커밋 해시).
+   - 마지막에 한 줄로 결과를 알린다(뉴스 개수, 커뮤니티·세무 출처별 개수, 커밋 해시).

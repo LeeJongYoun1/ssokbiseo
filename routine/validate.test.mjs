@@ -29,3 +29,9 @@ test('geeknews no longer required', () => {
   assert.deepEqual(validateBriefing(rest), []);
 });
 test('not object', () => assert.ok(validateBriefing(null).length > 0));
+test('tax keys', () => {
+  const g = { title: 'a', points: 5, summary: 's', url: 'https://a', discussUrl: null };
+  assert.deepEqual(validateBriefing({ ...sample, tax: { sejungilbo: [{ ...g, points: null }], nts_press: [g], nts_notice: [] } }), []);
+  assert.ok(validateBriefing({ ...sample, tax: { hankyung: [] } }).some(m => m.includes('hankyung')));
+  assert.ok(validateBriefing({ ...sample, tax: { nts_press: [{ ...g, points: 'x' }] } }).some(m => m.includes('tax.nts_press[0].points')));
+});

@@ -104,6 +104,22 @@ void main() {
     expect(store.load().communities, isEmpty);
   });
 
+  testWidgets('세무 소식 체크: 기본 3곳, 끄기, 0개 허용', (t) async {
+    await pump(t, []);
+    await t.tap(find.text('세정일보'));
+    await t.tap(find.text('국세청 공지사항'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('저장'));
+    await t.pumpAndSettle();
+    expect(store.load().taxSources, ['nts_press']);
+    await pump(t, [], settings: Settings(taxSources: ['nts_press']));
+    await t.tap(find.text('국세청 보도자료'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('저장'));
+    await t.pumpAndSettle();
+    expect(store.load().taxSources, isEmpty);
+  });
+
   testWidgets('말투 명언 인용 선택 -> quote', (t) async {
     await pump(t, []);
     await t.tap(find.text(kTones.firstWhere((e) => e.key == 'quote').label));

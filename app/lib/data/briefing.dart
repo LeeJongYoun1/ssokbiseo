@@ -8,6 +8,13 @@ const List<Community> kCommunities = [
   (key: '82cook', label: '82cook', pointsLabel: '조회'),
 ];
 
+/// 홈 세무 소식 카드 순서이자 설정 목록.
+const List<Community> kTaxSources = [
+  (key: 'sejungilbo', label: '세정일보', pointsLabel: ''),
+  (key: 'nts_press', label: '국세청 보도자료', pointsLabel: '조회'),
+  (key: 'nts_notice', label: '국세청 공지사항', pointsLabel: '조회'),
+];
+
 const kTopics = ['경제', '재테크', '세무', '부동산', '건강', 'IT', '정치', '사회', '국제', '과학', '스포츠', '연예'];
 
 typedef Mood = ({String key, String emoji, String label});
@@ -55,7 +62,8 @@ class Briefing {
   final Map<String, List<NewsItem>> news;
   final Map<String, Map<String, String>> advice;
   final Map<String, List<CommunityItem>> community;
-  const Briefing(this.date, this.news, this.advice, this.community);
+  final Map<String, List<CommunityItem>> tax;
+  const Briefing(this.date, this.news, this.advice, this.community, [this.tax = const {}]);
 
   List<CommunityItem> get geeknews => community['geeknews'] ?? const [];
 
@@ -63,6 +71,7 @@ class Briefing {
     final rawNews = (j['news'] as Map?) ?? {};
     // 옛 파일: 최상위 geeknews만 있으면 community.geeknews로 본다.
     final rawCom = (j['community'] as Map?) ?? {'geeknews': j['geeknews']};
+    final rawTax = (j['tax'] as Map?) ?? {};
     final rawAdvice = (j['advice'] as Map?) ?? {};
     return Briefing(
       j['date'] as String? ?? '',
@@ -86,6 +95,14 @@ class Briefing {
           if (rawCom[c.key] is List)
             c.key: [
               for (final e in rawCom[c.key] as List)
+                CommunityItem.fromJson(Map<String, dynamic>.from(e as Map))
+            ]
+      },
+      {
+        for (final c in kTaxSources)
+          if (rawTax[c.key] is List)
+            c.key: [
+              for (final e in rawTax[c.key] as List)
                 CommunityItem.fromJson(Map<String, dynamic>.from(e as Map))
             ]
       },

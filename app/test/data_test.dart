@@ -105,6 +105,7 @@ void main() {
       final s = SettingsStore(await prefs(), now: today).load();
       expect(s.topics, ['경제', 'IT', '건강']);
       expect(s.communities, ['geeknews']);
+      expect(s.taxSources, ['sejungilbo', 'nts_press', 'nts_notice']);
       expect((s.tone, s.home), ('friend', null));
     });
     test('round trip + mood valid only today (KST)', () async {
@@ -126,6 +127,16 @@ void main() {
       expect(st.load().communities, ['geeknews']);
       await st.save(Settings(communities: []));
       expect(st.load().communities, isEmpty);
+    });
+    test('taxSources round trip; legacy -> all three', () async {
+      final p = await prefs();
+      final st = SettingsStore(p, now: today);
+      await st.save(Settings(taxSources: ['nts_press']));
+      expect(st.load().taxSources, ['nts_press']);
+      p.setString('settings_json', '{"topics":["IT"]}');
+      expect(st.load().taxSources, ['sejungilbo', 'nts_press', 'nts_notice']);
+      await st.save(Settings(taxSources: []));
+      expect(st.load().taxSources, isEmpty);
     });
   });
 }

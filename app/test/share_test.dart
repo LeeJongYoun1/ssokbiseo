@@ -98,6 +98,29 @@ void main() {
     expect(find.text('토론 보기'), findsNothing);
   });
 
+  testWidgets('세무 소식: 선택·순서·라벨, 비면 안내', (t) async {
+    final b = Briefing('d', {}, {}, {}, {
+      'sejungilbo': [const CommunityItem('s', null, 'x', 'https://s')],
+      'nts_press': [const CommunityItem('p', 12, 'x', 'https://p')],
+      'nts_notice': [const CommunityItem('n', 3, 'x', 'https://n')],
+    });
+    await t.pumpWidget(MaterialApp(
+        home: Scaffold(body: SingleChildScrollView(child: TaxCard(Future.value(b), false, const ['nts_press', 'sejungilbo'])))));
+    await t.pumpAndSettle();
+    expect(find.text('세무 소식'), findsOneWidget);
+    expect(find.text('국세청 공지사항 (1)'), findsNothing);
+    expect(t.getTopLeft(find.text('세정일보 (1)')).dy < t.getTopLeft(find.text('국세청 보도자료 (1)')).dy, true);
+    await t.tap(find.text('국세청 보도자료 (1)'));
+    await t.tap(find.text('세정일보 (1)'));
+    await t.pumpAndSettle();
+    expect(find.text('조회 12'), findsOneWidget);
+    expect(find.textContaining('조회'), findsOneWidget);
+    await t.pumpWidget(MaterialApp(
+        home: Scaffold(body: TaxCard(Future.value(b), false, const []))));
+    await t.pumpAndSettle();
+    expect(find.text('설정에서 볼 세무 소식을 골라 주세요'), findsOneWidget);
+  });
+
   testWidgets('아무것도 안 골랐으면 안내', (t) async {
     await pumpCard(t, [], const Briefing('d', {}, {}, {}));
     expect(find.text('설정에서 볼 커뮤니티를 골라 주세요'), findsOneWidget);

@@ -146,6 +146,7 @@ class _HomePageState extends State<HomePage> {
           RouteCard(_route, () => _allow(widget.location.request)),
           MoodCard(_b, _stale, _s.moodToday, _s.tone, _pick),
           NewsCard(_b, _stale, _s.topics),
+          TaxCard(_b, _stale, _s.taxSources),
           YoutubeCard(_yt, open: widget.openUrl),
           CommunityCard(_b, _stale, _s.communities),
         ],

@@ -8,13 +8,14 @@ import 'youtube.dart';
 
 class Settings {
   Place? home, work;
-  List<String> topics, communities;
+  List<String> topics, communities, taxSources;
   String tone;
   String? moodToday, moodDate;
   List<YtChannel> channels;
-  Settings({this.home, this.work, List<String>? topics, List<String>? communities, this.tone = 'friend', this.moodToday, this.moodDate, List<YtChannel>? channels})
+  Settings({this.home, this.work, List<String>? topics, List<String>? communities, List<String>? taxSources, this.tone = 'friend', this.moodToday, this.moodDate, List<YtChannel>? channels})
       : topics = topics ?? ['경제', 'IT', '건강'],
         communities = communities ?? ['geeknews'],
+        taxSources = taxSources ?? ['sejungilbo', 'nts_press', 'nts_notice'],
         channels = channels ?? [];
 }
 
@@ -36,6 +37,7 @@ class SettingsStore {
         work: pl('work'),
         topics: (j['topics'] as List?)?.cast<String>(),
         communities: (j['communities'] as List?)?.cast<String>(),
+        taxSources: (j['taxSources'] as List?)?.cast<String>(),
         tone: j['tone'] as String? ?? 'friend',
         moodToday: fresh ? j['moodToday'] as String? : null,
         moodDate: fresh ? j['moodDate'] as String? : null,
@@ -56,6 +58,7 @@ class SettingsStore {
         'work': s.work?.toJson(),
         'topics': s.topics,
         'communities': s.communities,
+        'taxSources': s.taxSources,
         'tone': s.tone,
         'moodToday': s.moodToday,
         'moodDate': s.moodDate,
