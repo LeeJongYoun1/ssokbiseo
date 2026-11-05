@@ -50,6 +50,18 @@ Widget bodyText(String s) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 2),
     child: Text(s, style: const TextStyle(fontSize: 17, height: 1.4)));
 
+/// 위치 이름표 — 날씨·길찾기 카드 공용 (굵은 글씨로만 눈에 띄게)
+class PlaceChip extends StatelessWidget {
+  final String name; // 내 위치 / 집 / 회사
+  final String suffix;
+  const PlaceChip(this.name, {this.suffix = '', super.key});
+
+  @override
+  Widget build(BuildContext context) => Text('$name$suffix',
+      style: const TextStyle(
+          fontSize: 18, fontWeight: FontWeight.bold, color: SsokColors.ink));
+}
+
 /// Future 하나를 로딩/실패/완료로 그린다 — 카드마다 따로 실패한다.
 class CardFuture<T> extends StatelessWidget {
   final Future<T> future;

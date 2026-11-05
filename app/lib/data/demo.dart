@@ -5,19 +5,29 @@ import 'package:http/http.dart' as http;
 
 import 'briefing.dart';
 import 'briefing_repo.dart';
+import '../ui/cards/weather_card.dart' show slotHours;
 import 'server_api.dart';
 
 const _delay = Duration(milliseconds: 300);
 
 /// 키·서버 없이 쓰는 예시 응답.
 class DemoServerApi extends ServerApi {
-  DemoServerApi() : super(http.Client());
+  final DateTime Function() _now;
+  DemoServerApi({DateTime Function()? now})
+      : _now = now ?? DateTime.now,
+        super(http.Client());
 
   @override
   Future<Weather> weather(double lat, double lon) async {
     await Future<void>.delayed(_delay);
     final d = (lat * 10).round() % 3; // 집·회사가 조금 다르게 보이도록
-    return Weather(12 + d, '맑음', '없음', 10, 6 + d, 17 + d);
+    const skies = ['맑음', '맑음', '구름많음', '흐림', '흐림', '맑음'];
+    final hours = slotHours(_now());
+    return Weather(12 + d, '맑음', '없음', 10, 6 + d, 17 + d, [
+      for (var i = 0; i < 6; i++)
+        HourWeather(hours[i], 12 + d + (i < 3 ? i : 5 - i) - 1, skies[i],
+            i == 3 ? '비' : '없음', i == 3 ? 70 : 10 + i * 5),
+    ]);
   }
 
   @override

@@ -6,6 +6,8 @@ import 'package:biseo/data/calendar.dart';
 import 'package:biseo/data/location.dart';
 import 'package:biseo/data/server_api.dart';
 import 'package:biseo/data/settings.dart';
+import 'package:biseo/ui/cards/shell.dart';
+import 'package:biseo/ui/cards/weather_card.dart';
 import 'package:biseo/ui/home_page.dart';
 import 'package:biseo/ui/settings_page.dart';
 import 'package:flutter/material.dart';
@@ -71,8 +73,9 @@ Future<void> pump(WidgetTester t,
 const work = Place('회사', '서울', 37.6, 127.0);
 final wx = {'/api/weather': {'tempC': 10, 'sky': '맑음', 'rain': '없음', 'popMax': 0, 'tmin': null, 'tmax': null}};
 List<String> wrows(WidgetTester t) => [
-      for (final w in t.widgetList<Text>(find.textContaining('강수확률')))
-        w.data!.split(' ').first
+      for (final w in t.widgetList<PlaceChip>(
+          find.descendant(of: find.byType(WeatherCard), matching: find.byType(PlaceChip))))
+        w.name
     ];
 
 void main() {
@@ -124,6 +127,7 @@ void main() {
           '/api/route': {'carMin': 25, 'transitMin': null, 'transitBlocked': true},
           '/api/weather': {'tempC': 10, 'sky': '맑음', 'rain': '없음', 'popMax': 0, 'tmin': null, 'tmax': null},
         });
+    expect(find.text('집까지'), findsOneWidget);
     expect(find.text('카카오맵에서 보기'), findsOneWidget);
     expect(find.textContaining('🚗 25분'), findsOneWidget);
     expect(find.textContaining('🚌 오늘은 확인할 수 없어요'), findsOneWidget);
@@ -153,7 +157,10 @@ void main() {
 
   testWidgets('집·회사에서 10km 밖 -> 내 위치, 집, 회사 순', (t) async {
     await pump(t, routes: wx, settings: Settings(home: home, work: work), loc: FakeLoc((36.0, 127.0)));
-    expect(wrows(t), ['내', '집', '회사']);
+    expect(wrows(t), ['내 위치', '집', '회사']);
+    expect(find.text('내 위치'), findsOneWidget);
+    expect(find.text('집'), findsOneWidget);
+    expect(find.text('회사'), findsOneWidget);
   });
 
   testWidgets('집 10km 안 -> 집, 회사만', (t) async {
@@ -170,7 +177,7 @@ void main() {
 
   testWidgets('집·회사 미등록 + 위치 있음 -> 내 위치와 안내', (t) async {
     await pump(t, routes: wx);
-    expect(wrows(t), ['내']);
+    expect(wrows(t), ['내 위치']);
     expect(find.text('설정에서 집·회사를 등록해 주세요'), findsNWidgets(2));
   });
 

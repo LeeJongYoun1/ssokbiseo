@@ -54,6 +54,18 @@ export function makeWeatherHandler(o: { store?: Store; now?: () => Date } = {}) 
     const cnt: Record<string, number> = {};
     for (const v of vals('SKY')) cnt[v] = (cnt[v] ?? 0) + 1;
     const sky = Object.entries(cnt).sort((a, b) => b[1] - a[1])[0]?.[0];
+    // 3시간 간격 6칸: 지금 KST 시각 다음의 3의 배수 시각부터
+    const k = new Date(now.getTime() + 9 * 3600_000);
+    const t0 = Date.UTC(k.getUTCFullYear(), k.getUTCMonth(), k.getUTCDate()) + (Math.floor(k.getUTCHours() / 3) + 1) * 3 * 3600_000;
+    const hourly = [];
+    for (let i = 0; i < 6; i++) {
+      const t = new Date(t0 + i * 3 * 3600_000);
+      const d = t.toISOString().slice(0, 10).replace(/-/g, ''), hh = String(t.getUTCHours()).padStart(2, '0') + '00';
+      const at = (c: string) => fc.find((x) => x.category === c && x.fcstDate === d && x.fcstTime === hh)?.fcstValue;
+      const tmp = Number(at('TMP')), sk = SKY[at('SKY') ?? ''], pt = PTY[at('PTY') ?? ''], pop = Number(at('POP'));
+      if (at('TMP') === undefined || !Number.isFinite(tmp) || !sk || !pt || at('POP') === undefined || !Number.isFinite(pop)) continue;
+      hourly.push({ hour: t.getUTCHours(), tempC: tmp, sky: sk, rain: pt, pop });
+    }
     const tempC = Number(cur('T1H'));
     if (!Number.isFinite(tempC)) throw new Error('no temp');
     return json({
@@ -63,6 +75,7 @@ export function makeWeatherHandler(o: { store?: Store; now?: () => Date } = {}) 
       popMax: Math.max(0, ...vals('POP').map(Number)),
       tmin: num('TMN'),
       tmax: num('TMX'),
+      hourly,
     });
   } catch {
     return json({ error: 'kma upstream error' }, 502);

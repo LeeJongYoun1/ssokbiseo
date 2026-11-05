@@ -51,9 +51,14 @@ class RouteCard extends StatelessWidget {
                   Expanded(
                       child: InkWell(
                           onTap: () => openKakao(from, to, 'PUBTRANS'),
-                          child: bodyText('$name까지  '
-                              '🚗 ${r.carMin == null ? '-' : '${r.carMin}분'} · '
-                              '🚌 ${r.transitBlocked ? '오늘은 확인할 수 없어요' : r.transitMin == null ? '' : '${r.transitMin}분'}'))),
+                          child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 8,
+                              children: [
+                            PlaceChip(name, suffix: '까지'),
+                            bodyText('🚗 ${r.carMin == null ? '-' : '${r.carMin}분'} · '
+                              '🚌 ${r.transitBlocked ? '오늘은 확인할 수 없어요' : r.transitMin == null ? '' : '${r.transitMin}분'}'),
+                          ]))),
                   if (r.transitMin == null)
                     TextButton(
                         onPressed: () => openKakao(from, to, 'PUBTRANS'),

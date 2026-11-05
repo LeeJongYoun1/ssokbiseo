@@ -11,15 +11,29 @@ class ServerException implements Exception {
   String toString() => 'ServerException: $message';
 }
 
+class HourWeather {
+  final int hour; // KST 0~23
+  final num tempC, pop;
+  final String sky, rain;
+  const HourWeather(this.hour, this.tempC, this.sky, this.rain, this.pop);
+  factory HourWeather.fromJson(Map<String, dynamic> j) => HourWeather(
+      (j['hour'] as num).toInt(), j['tempC'] as num, j['sky'] as String,
+      j['rain'] as String, j['pop'] as num);
+}
+
 class Weather {
   final num tempC;
   final String sky, rain;
   final num popMax;
   final num? tmin, tmax;
-  const Weather(this.tempC, this.sky, this.rain, this.popMax, this.tmin, this.tmax);
+  final List<HourWeather> hourly; // 옛 서버는 없음
+  const Weather(this.tempC, this.sky, this.rain, this.popMax, this.tmin, this.tmax,
+      [this.hourly = const []]);
   factory Weather.fromJson(Map<String, dynamic> j) => Weather(
       j['tempC'] as num, j['sky'] as String, j['rain'] as String,
-      j['popMax'] as num, j['tmin'] as num?, j['tmax'] as num?);
+      j['popMax'] as num, j['tmin'] as num?, j['tmax'] as num?,
+      [for (final h in (j['hourly'] as List?) ?? const [])
+        HourWeather.fromJson(h as Map<String, dynamic>)]);
 }
 
 class Place {

@@ -39,7 +39,7 @@
 
 | 경로 | 입력 | 출력(JSON) |
 |---|---|---|
-| `GET /api/weather` | `lat`, `lon` | `{ tempC: number, sky: "맑음"\|"구름많음"\|"흐림", rain: "없음"\|"비"\|"비/눈"\|"눈"\|"소나기", popMax: number, tmin: number\|null, tmax: number\|null }` |
+| `GET /api/weather` | `lat`, `lon` | `{ tempC: number, sky: "맑음"\|"구름많음"\|"흐림", rain: "없음"\|"비"\|"비/눈"\|"눈"\|"소나기", popMax: number, tmin: number\|null, tmax: number\|null, hourly: { hour: 0-23, tempC, sky, rain, pop }[] (3시간 간격 최대 6칸) }` |
 | `GET /api/geocode` | `q` | `{ items: [{ name: string, address: string, lat: number, lon: number }] }` (최대 5개) |
 | `GET /api/route` | `fromLat`,`fromLon`,`toLat`,`toLon` | `{ carMin: number\|null, transitMin: number\|null, transitBlocked: boolean }` |
 | `GET /api/news-raw` | (없음, 헤더 `x-ssok-key` 대신 `x-ssok-routine-key`) | `{ date: "YYYY-MM-DD", topics: { [topic]: [{ title, description, link, pubDate }] } }` |
