@@ -7,7 +7,7 @@ import '../theme.dart';
 import 'news_card.dart';
 import 'youtube_card.dart';
 
-/// 맨 아래 목록 — 한 줄이 한 구역이고, 누르면 그 구역 전체 화면이 열린다.
+/// 맨 아래 목록 — 한 줄이 한 구역이고, 누르면 그 줄 아래로 펼쳐진다.
 class SectionList extends StatelessWidget {
   final Future<Briefing?> briefing;
   final Future<ChannelVideos?>? videos; // null = 채널 없음
@@ -75,7 +75,7 @@ class SectionList extends StatelessWidget {
 
 String _n(int? n, {String sep = ''}) => n == null ? '' : '$sep$n개';
 
-class _Row<T> extends StatelessWidget {
+class _Row<T> extends StatefulWidget {
   final String label;
   final Future<T> future;
   final String Function(T?) summary;
@@ -83,57 +83,64 @@ class _Row<T> extends StatelessWidget {
   const _Row(this.label, this.future, this.summary, this.body);
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: () => Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => SectionPage(label, body)),
-    ),
-    child: Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: SsokColors.border)),
-      ),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: FutureBuilder<T>(
-              future: future,
-              builder: (_, s) => Text(
-                '${summary(s.hasData ? s.data : null)} ›',
-                textAlign: TextAlign.end,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 14, color: SsokColors.inkSub),
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
+  State<_Row<T>> createState() => _RowState<T>();
 }
 
-class SectionPage extends StatelessWidget {
-  final String title;
-  final Widget body;
-  const SectionPage(this.title, this.body, {super.key});
+// 화면을 넘기지 않고 줄 바로 아래에 펼친다
+class _RowState<T> extends State<_Row<T>> {
+  bool _open = false;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(title)),
-    body: SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        16,
-        0,
-        16,
-        24 + MediaQuery.paddingOf(context).bottom,
-      ),
-      child: body,
+  Widget build(BuildContext context) => Container(
+    decoration: const BoxDecoration(
+      border: Border(bottom: BorderSide(color: SsokColors.border)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        InkWell(
+          onTap: () => setState(() => _open = !_open),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
+            child: Row(
+              children: [
+                Text(
+                  widget.label,
+                  style: const TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FutureBuilder<T>(
+                    future: widget.future,
+                    builder: (_, s) => Text(
+                      widget.summary(s.hasData ? s.data : null),
+                      textAlign: TextAlign.end,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: SsokColors.inkSub,
+                      ),
+                    ),
+                  ),
+                ),
+                Icon(
+                  _open ? Icons.expand_less : Icons.expand_more,
+                  color: SsokColors.inkSub,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_open)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 4, 12),
+            child: widget.body,
+          ),
+      ],
     ),
   );
 }

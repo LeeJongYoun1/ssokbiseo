@@ -212,13 +212,17 @@ void main() {
     expect(texts.where(emoji.hasMatch), isEmpty);
   });
 
-  testWidgets('목록 줄을 누르면 그 구역 화면이 열린다', (t) async {
+  testWidgets('목록 줄을 누르면 화면을 넘기지 않고 아래로 펼쳐지고, 다시 누르면 접힌다', (t) async {
     await pump(t);
+    expect(find.text('경제'), findsNothing);
     await t.tap(find.text('관심 뉴스'));
     await t.pumpAndSettle();
-    expect(find.byType(SectionPage), findsOneWidget);
-    expect(find.widgetWithText(AppBar, '관심 뉴스'), findsOneWidget);
+    expect(find.byType(HomePage), findsOneWidget);
+    expect(find.byType(BackButton), findsNothing);
     expect(find.text('경제'), findsOneWidget);
+    await t.tap(find.text('관심 뉴스'));
+    await t.pumpAndSettle();
+    expect(find.text('경제'), findsNothing);
   });
 
   // 실기기 버그: 아래로 갔다가 쓸어내리면 위 카드가 새로 만들어지며 한 프레임 로딩(작은 높이)으로

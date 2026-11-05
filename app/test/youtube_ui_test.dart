@@ -89,7 +89,7 @@ void main() {
     final opened = <String>[];
     await pumpHome(t, FakeYt(result: [(ch, [vid('v1', 2), vid('v2', 5)])]),
         channels: [ch], opened: opened);
-    expect(find.text('2개 ›'), findsOneWidget);
+    expect(find.text('2개'), findsOneWidget);
     await openRow(t);
     expect(find.text('맛집채널 (2)'), findsOneWidget);
     expect(find.text('v1'), findsNothing); // 접힌 상태
