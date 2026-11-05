@@ -1,0 +1,141 @@
+{
+  "date": "2026-11-06",
+  "generatedAt": "2026-11-06T05:31:00+09:00",
+  "news": {
+    "경제": [
+      {
+        "title": "(예시) 코스피 장 초반 강보합, 외국인 순매수",
+        "summary": "코스피 장 초반 강보합, 외국인 순매수 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140100"
+      },
+      {
+        "title": "원/달러 환율 소폭 하락",
+        "summary": "원/달러 환율 소폭 하락 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140101"
+      }
+    ],
+    "부동산": [
+      {
+        "title": "(서울) 아파트 거래량 두 달 연속 증가",
+        "summary": "(서울) 아파트 거래량 두 달 연속 증가 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140102"
+      }
+    ],
+    "건강": [
+      {
+        "title": "환절기 독감 예방접종 시작",
+        "summary": "환절기 독감 예방접종 시작 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140103"
+      }
+    ],
+    "IT": [
+      {
+        "title": "국내 AI 반도체 신제품 공개",
+        "summary": "국내 AI 반도체 신제품 공개 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140104"
+      },
+      {
+        "title": "스마트폰 보안 업데이트 배포",
+        "summary": "스마트폰 보안 업데이트 배포 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140105"
+      }
+    ],
+    "정치": [
+      {
+        "title": "국회, 내년도 예산안 심사 착수",
+        "summary": "국회, 내년도 예산안 심사 착수 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140106"
+      }
+    ],
+    "사회": [
+      {
+        "title": "출근길 강추위, 오전까지 이어져",
+        "summary": "출근길 강추위, 오전까지 이어져 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140107"
+      }
+    ],
+    "국제": [
+      {
+        "title": "주요국 정상회의 개최, 무역 논의",
+        "summary": "주요국 정상회의 개최, 무역 논의 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140108"
+      }
+    ],
+    "과학": [
+      {
+        "title": "국내 연구진, 신소재 배터리 개발",
+        "summary": "국내 연구진, 신소재 배터리 개발 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140109"
+      }
+    ],
+    "스포츠": [
+      {
+        "title": "프로농구 선두 팀 3연승",
+        "summary": "프로농구 선두 팀 3연승 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140110"
+      }
+    ],
+    "연예": [
+      {
+        "title": "신작 드라마 첫 방송 시청률 5%",
+        "summary": "신작 드라마 첫 방송 시청률 5% 소식이에요",
+        "url": "https://n.news.naver.com/mnews/article/001/00140111"
+      }
+    ]
+  },
+  "advice": {
+    "good": {
+      "friend": "기분 좋은 하루네요! 그 기분 그대로 가요.",
+      "coach": "좋아요, 오늘 한 번 달려 봅시다!",
+      "quote": "\"행복은 습관이다.\" 오늘도 하나 쌓아 봐요.",
+      "action": "좋은 기분일 때 미뤄 둔 일 하나를 끝내 보세요."
+    },
+    "tired": {
+      "friend": "많이 피곤하죠? 오늘은 무리하지 말아요.",
+      "coach": "할 일 하나만 정하고 나머지는 내려놓읍시다.",
+      "quote": "\"쉬는 것도 일의 일부다.\" 잠깐 쉬어 가요.",
+      "action": "물 한 잔 마시고 5분만 눈을 감아 보세요."
+    },
+    "worried": {
+      "friend": "걱정이 많네요. 혼자 끌어안지 말아요.",
+      "coach": "걱정은 접고, 지금 할 수 있는 것부터 합시다.",
+      "quote": "\"걱정의 대부분은 일어나지 않는다.\" 숨 한 번 돌려요.",
+      "action": "걱정되는 일을 종이에 적고 첫 단계만 골라 보세요."
+    },
+    "down": {
+      "friend": "마음이 무겁죠. 그래도 여기까지 온 것만으로 충분해요.",
+      "coach": "작게라도 한 걸음, 그걸로 오늘은 이긴 겁니다.",
+      "quote": "\"가장 어두운 때가 해뜨기 직전이다.\" 조금만 버텨요.",
+      "action": "밖에 나가 10분만 걸으며 햇빛을 쬐어 보세요."
+    },
+    "eager": {
+      "friend": "의욕이 넘치네요! 오늘 뭐든 해낼 수 있어요.",
+      "coach": "불붙었을 때 가장 중요한 일부터 칩시다!",
+      "quote": "\"시작이 반이다.\" 지금 바로 시작해 봐요.",
+      "action": "오늘 꼭 끝낼 일 세 가지를 적고 첫 번째부터 하세요."
+    }
+  },
+  "geeknews": [
+    {
+      "title": "(예시) GeekNews 인기 글 1",
+      "points": 50,
+      "summary": "작성자가 소개한 오픈소스 도구예요. 설치가 쉽고 문서가 잘 되어 있다고 해요.",
+      "url": "https://github.com/example/post/1",
+      "discussUrl": "https://news.hada.io/topic?id=20001"
+    },
+    {
+      "title": "(예시) GeekNews 인기 글 2",
+      "points": 40,
+      "summary": "작성자가 소개한 오픈소스 도구예요. 설치가 쉽고 문서가 잘 되어 있다고 해요.",
+      "url": "https://github.com/example/post/2",
+      "discussUrl": "https://news.hada.io/topic?id=20002"
+    },
+    {
+      "title": "(예시) GeekNews 인기 글 3",
+      "points": 30,
+      "summary": "작성자가 소개한 오픈소스 도구예요. 설치가 쉽고 문서가 잘 되어 있다고 해요.",
+      "url": "https://github.com/example/post/3",
+      "discussUrl": "https://news.hada.io/topic?id=20003"
+    }
+  ]
+}
