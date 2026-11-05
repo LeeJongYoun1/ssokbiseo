@@ -34,7 +34,7 @@ void main() {
   });
 
   test('constants', () {
-    expect(kTopics.length, 10);
+    expect(kTopics.length, 12);
     expect(kMoods.map((m) => m.key), ['good', 'tired', 'worried', 'down', 'eager']);
     expect(kTones.map((t) => t.key), ['friend', 'coach', 'quote', 'action']);
   });

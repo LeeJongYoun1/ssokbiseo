@@ -26,7 +26,7 @@ export SSOK_SERVER=https://<your-vercel-app>.vercel.app
    ```
    curl -sS --fail -H "x-ssok-routine-key: $SSOK_ROUTINE_KEY" "$SSOK_SERVER/api/news-raw"
    ```
-   결과는 `{ date, topics: { 주제: [{ title, description, link, pubDate }] } }`. 주제는 경제, 부동산, 건강, IT, 정치, 사회, 국제, 과학, 스포츠, 연예 열 가지.
+   결과는 `{ date, topics: { 주제: [{ title, description, link, pubDate }] } }`. 주제는 경제, 재테크, 세무, 부동산, 건강, IT, 정치, 사회, 국제, 과학, 스포츠, 연예 열두 가지.
 
 2. 뉴스 요약: 각 기사의 **제목과 미리보기(description)만** 보고 **한 줄(40자 안팎)로 요약**한다. 기사 본문 페이지는 열지 않는다. 주제마다 최대 10개. 결과는 `{ "title": 제목, "summary": 한 줄 요약, "url": link }`. 제목의 `<b>` 같은 태그나 `&quot;` 같은 엔티티는 지운다. url은 `https://`로 시작하는 것만 쓴다.
 

@@ -133,7 +133,10 @@ void main() {
     await t.tap(find.byTooltip('설정'));
     await t.pumpAndSettle();
     expect(find.byType(SettingsPage), findsOneWidget);
-    await t.tap(find.widgetWithText(CheckboxListTile, '건강'));
+    final cb = find.widgetWithText(CheckboxListTile, '건강');
+    await t.ensureVisible(cb);
+    await t.pumpAndSettle();
+    await t.tap(cb);
     await t.tap(find.text('저장'));
     await t.pumpAndSettle();
     expect(find.byType(SettingsPage), findsNothing);

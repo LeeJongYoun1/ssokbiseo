@@ -1,4 +1,4 @@
-export const TOPICS = ['경제', '부동산', '건강', 'IT', '정치', '사회', '국제', '과학', '스포츠', '연예'];
+export const TOPICS = ['경제', '재테크', '세무', '부동산', '건강', 'IT', '정치', '사회', '국제', '과학', '스포츠', '연예'];
 export const MOODS = ['good', 'tired', 'worried', 'down', 'eager'];
 export const TONES = ['friend', 'coach', 'quote', 'action'];
 

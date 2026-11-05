@@ -13,14 +13,14 @@ test('cleanText: 태그 제거, 엔티티 해제, 공백 정리', () => {
   expect(cleanText(' a &lt;b&gt; &#39;x&#39; &apos;y&apos; &#65;&#x42;\n\n c ')).toBe("a <b> 'x' 'y' AB c");
 });
 
-test('주제 10개 모두 키로 있고, 각 display=10&sort=date로 호출', async () => {
+test('주제 12개 모두 키로 있고, 각 display=10&sort=date로 호출', async () => {
   const f = vi.fn(async (_u: string, _o?: any) => new Response(JSON.stringify({ items: [item] })));
   vi.stubGlobal('fetch', f);
   const j = await GET(rq()).then((r) => r.json());
   expect(Object.keys(j.topics)).toEqual([...TOPICS]);
-  expect(TOPICS).toHaveLength(10);
+  expect(TOPICS).toHaveLength(12);
   expect(j.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-  expect(f).toHaveBeenCalledTimes(10);
+  expect(f).toHaveBeenCalledTimes(12);
   const u = f.mock.calls[0][0];
   expect(u).toContain('display=10');
   expect(u).toContain('sort=date');

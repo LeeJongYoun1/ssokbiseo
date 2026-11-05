@@ -1,4 +1,4 @@
-const kTopics = ['경제', '부동산', '건강', 'IT', '정치', '사회', '국제', '과학', '스포츠', '연예'];
+const kTopics = ['경제', '재테크', '세무', '부동산', '건강', 'IT', '정치', '사회', '국제', '과학', '스포츠', '연예'];
 
 typedef Mood = ({String key, String emoji, String label});
 typedef Tone = ({String key, String label});
