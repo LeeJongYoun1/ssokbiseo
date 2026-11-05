@@ -7,6 +7,7 @@ import 'package:biseo/data/location.dart';
 import 'package:biseo/data/server_api.dart';
 import 'package:biseo/data/settings.dart';
 import 'package:biseo/ui/home_page.dart';
+import 'package:biseo/ui/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -114,5 +115,19 @@ void main() {
   testWidgets('stale -> 어제 내용이에요', (t) async {
     await pump(t, now: DateTime.utc(2026, 11, 6, 21)); // 하루 뒤
     expect(find.text('어제 내용이에요'), findsWidgets);
+  });
+
+  testWidgets('톱니 -> 설정 열림 -> 저장하면 홈이 새로고침된다', (t) async {
+    await pump(t); // 기본 주제: 경제, IT, 건강
+    expect(find.text('건강'), findsOneWidget);
+    await t.tap(find.byTooltip('설정'));
+    await t.pumpAndSettle();
+    expect(find.byType(SettingsPage), findsOneWidget);
+    await t.tap(find.widgetWithText(CheckboxListTile, '건강'));
+    await t.tap(find.text('저장'));
+    await t.pumpAndSettle();
+    expect(find.byType(SettingsPage), findsNothing);
+    expect(find.text('건강'), findsNothing);
+    expect(find.text('경제'), findsOneWidget);
   });
 }

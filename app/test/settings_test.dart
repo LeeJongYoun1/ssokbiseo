@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:biseo/data/briefing.dart';
+import 'package:biseo/data/kst.dart';
 import 'package:biseo/data/server_api.dart';
 import 'package:biseo/data/settings.dart';
 import 'package:biseo/ui/settings_page.dart';
@@ -105,5 +106,15 @@ void main() {
     await pump(t, null);
     await search(t, '집', '판교역');
     expect(find.text('주소를 찾지 못했어요. 잠시 뒤 다시 해 보세요'), findsOneWidget);
+  });
+
+  testWidgets('저장해도 오늘 기분(moodToday/moodDate)은 보존된다', (t) async {
+    final today = kstToday(DateTime.now());
+    await pump(t, [], settings: Settings(moodToday: 'tired', moodDate: today));
+    await t.tap(find.text('저장'));
+    await t.pumpAndSettle();
+    final s = store.load();
+    expect(s.moodToday, 'tired');
+    expect(s.moodDate, today);
   });
 }
