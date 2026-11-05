@@ -43,37 +43,48 @@ class NewsCard extends StatelessWidget {
 class CommunityCard extends StatelessWidget {
   final Future<Briefing?> briefing;
   final bool stale;
+  final List<String> selected;
   final ShareText share;
-  const CommunityCard(this.briefing, this.stale, {this.share = shareText, super.key});
+  const CommunityCard(this.briefing, this.stale, this.selected,
+      {this.share = shareText, super.key});
 
   @override
   Widget build(BuildContext context) => CardShell('커뮤니티', [
-        CardFuture<Briefing?>(briefing, '글을 불러오지 못했어요', (b) {
-          if (b == null) return bodyText('글을 불러오지 못했어요');
-          // 다른 커뮤니티는 이 목록에 (이름, 글 목록)만 더하면 된다.
-          final sections = [('GeekNews', b.geeknews)];
-          return Column(children: [
-            for (final (label, items) in sections)
-              ExpansionTile(
-                title: Text(items.isEmpty ? label : '$label (${items.length})',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                tilePadding: EdgeInsets.zero,
-                shape: const Border(),
-                collapsedShape: const Border(),
-                children: [
-                  if (items.isEmpty) bodyText('오늘은 소식이 없어요'),
-                  for (final g in items)
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(g.title, style: const TextStyle(fontSize: 17)),
-                      subtitle: Text('${g.points}점'),
-                      onTap: () => showDetail(context, g.title, g.summary,
-                          [('원문 보기', g.url), ('토론 보기', g.discussUrl)],
-                          share: share),
-                    ),
-                ],
-              ),
-          ]);
-        }),
+        if (kCommunities.every((c) => !selected.contains(c.key)))
+          bodyText('설정에서 볼 커뮤니티를 골라 주세요')
+        else
+          CardFuture<Briefing?>(briefing, '글을 불러오지 못했어요', (b) {
+            if (b == null) return bodyText('글을 불러오지 못했어요');
+            return Column(children: [
+              for (final c in kCommunities.where((c) => selected.contains(c.key)))
+                _section(context, c, b.community[c.key] ?? const []),
+            ]);
+          }),
       ], stale: stale);
+
+  Widget _section(BuildContext context, Community c, List<CommunityItem> items) =>
+      ExpansionTile(
+        title: Text(items.isEmpty ? c.label : '${c.label} (${items.length})',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        tilePadding: EdgeInsets.zero,
+        shape: const Border(),
+        collapsedShape: const Border(),
+        children: [
+          if (items.isEmpty) bodyText('오늘은 소식이 없어요'),
+          for (final g in items)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(g.title, style: const TextStyle(fontSize: 17)),
+              subtitle: g.points == null
+                  ? null
+                  : Text(c.pointsLabel == '점'
+                      ? '${g.points}점'
+                      : '${c.pointsLabel} ${g.points}'),
+              onTap: () => showDetail(context, g.title, g.summary, [
+                ('원문 보기', g.url),
+                if (g.discussUrl != null) ('토론 보기', g.discussUrl!),
+              ], share: share),
+            ),
+        ],
+      );
 }

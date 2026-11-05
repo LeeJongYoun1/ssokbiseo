@@ -88,6 +88,22 @@ void main() {
     expect(store.load().topics, ['경제']);
   });
 
+  testWidgets('커뮤니티 체크: 기본 GeekNews, 켜고 끄기, 0개 허용', (t) async {
+    await pump(t, []);
+    await t.tap(find.text('뽐뿌'));
+    await t.tap(find.text('GeekNews'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('저장'));
+    await t.pumpAndSettle();
+    expect(store.load().communities, ['ppomppu']);
+    await pump(t, [], settings: Settings(communities: ['ppomppu']));
+    await t.tap(find.text('뽐뿌'));
+    await t.pumpAndSettle();
+    await t.tap(find.text('저장'));
+    await t.pumpAndSettle();
+    expect(store.load().communities, isEmpty);
+  });
+
   testWidgets('말투 명언 인용 선택 -> quote', (t) async {
     await pump(t, []);
     await t.tap(find.text(kTones.firstWhere((e) => e.key == 'quote').label));

@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
           MoodCard(_b, _stale, _s.moodToday, _s.tone, _pick),
           NewsCard(_b, _stale, _s.topics),
           YoutubeCard(_yt, open: widget.openUrl),
-          CommunityCard(_b, _stale),
+          CommunityCard(_b, _stale, _s.communities),
         ],
       ),
     )),

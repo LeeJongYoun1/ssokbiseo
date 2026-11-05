@@ -129,27 +129,84 @@
       "action": "오늘 꼭 끝낼 일 세 가지를 적고 첫 번째부터 하세요."
     }
   },
-  "geeknews": [
-    {
-      "title": "(예시) GeekNews 인기 글 1",
-      "points": 50,
-      "summary": "작성자가 소개한 오픈소스 도구예요. 설치가 쉽고 문서가 잘 되어 있다고 해요.",
-      "url": "https://github.com/example/post/1",
-      "discussUrl": "https://news.hada.io/topic?id=20001"
-    },
-    {
-      "title": "(예시) GeekNews 인기 글 2",
-      "points": 40,
-      "summary": "작성자가 소개한 오픈소스 도구예요. 설치가 쉽고 문서가 잘 되어 있다고 해요.",
-      "url": "https://github.com/example/post/2",
-      "discussUrl": "https://news.hada.io/topic?id=20002"
-    },
-    {
-      "title": "(예시) GeekNews 인기 글 3",
-      "points": 30,
-      "summary": "작성자가 소개한 오픈소스 도구예요. 설치가 쉽고 문서가 잘 되어 있다고 해요.",
-      "url": "https://github.com/example/post/3",
-      "discussUrl": "https://news.hada.io/topic?id=20003"
-    }
-  ]
+  "community": {
+    "geeknews": [
+      {
+        "title": "(예시) GeekNews 인기 글 1",
+        "points": 50,
+        "summary": "작성자가 소개한 오픈소스 도구예요. 설치가 쉽고 문서가 잘 되어 있다고 해요.",
+        "url": "https://github.com/example/post/1",
+        "discussUrl": "https://news.hada.io/topic?id=20001"
+      },
+      {
+        "title": "(예시) GeekNews 인기 글 2",
+        "points": 40,
+        "summary": "작성자가 소개한 오픈소스 도구예요. 설치가 쉽고 문서가 잘 되어 있다고 해요.",
+        "url": "https://github.com/example/post/2",
+        "discussUrl": "https://news.hada.io/topic?id=20002"
+      },
+      {
+        "title": "(예시) GeekNews 인기 글 3",
+        "points": 30,
+        "summary": "작성자가 소개한 오픈소스 도구예요. 설치가 쉽고 문서가 잘 되어 있다고 해요.",
+        "url": "https://github.com/example/post/3",
+        "discussUrl": "https://news.hada.io/topic?id=20003"
+      }
+    ],
+    "ppomppu": [
+      {
+        "title": "(예시) ppomppu 인기글 1",
+        "points": 30,
+        "summary": "ppomppu 예시 요약이에요",
+        "url": "https://example.com/ppomppu/1",
+        "discussUrl": null
+      },
+      {
+        "title": "(예시) ppomppu 인기글 2",
+        "points": 23,
+        "summary": "ppomppu 예시 요약이에요",
+        "url": "https://example.com/ppomppu/2",
+        "discussUrl": null
+      },
+      {
+        "title": "(예시) ppomppu 인기글 3",
+        "points": 16,
+        "summary": "ppomppu 예시 요약이에요",
+        "url": "https://example.com/ppomppu/3",
+        "discussUrl": null
+      }
+    ],
+    "ruliweb": [
+      {
+        "title": "(예시) ruliweb 인기글 1",
+        "points": 90,
+        "summary": "ruliweb 예시 요약이에요",
+        "url": "https://example.com/ruliweb/1",
+        "discussUrl": null
+      },
+      {
+        "title": "(예시) ruliweb 인기글 2",
+        "points": 83,
+        "summary": "ruliweb 예시 요약이에요",
+        "url": "https://example.com/ruliweb/2",
+        "discussUrl": null
+      }
+    ],
+    "82cook": [
+      {
+        "title": "(예시) 82cook 인기글 1",
+        "points": 1200,
+        "summary": "82cook 예시 요약이에요",
+        "url": "https://example.com/82cook/1",
+        "discussUrl": null
+      },
+      {
+        "title": "(예시) 82cook 인기글 2",
+        "points": 1193,
+        "summary": "82cook 예시 요약이에요",
+        "url": "https://example.com/82cook/2",
+        "discussUrl": null
+      }
+    ]
+  }
 }

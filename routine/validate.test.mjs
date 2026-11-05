@@ -15,8 +15,17 @@ test('http url path', () => {
   assert.ok(e.some(m => m.includes('news.경제[3].url')));
 });
 test('unknown topic', () => assert.ok(validateBriefing({ ...sample, news: { 먹방: [] } }).some(e => e.includes('먹방'))));
-test('geeknews bad', () => {
-  const e = validateBriefing({ ...sample, geeknews: [{ title: 'a', points: '3', summary: 's', url: 'https://a', discussUrl: 'x' }] });
-  assert.ok(e.some(m => m.includes('geeknews[0].points')) && e.some(m => m.includes('geeknews[0].discussUrl')));
+test('community bad', () => {
+  const e = validateBriefing({ ...sample, community: { ppomppu: [{ title: 'a', points: '3', summary: 's', url: 'https://a', discussUrl: 'x' }] } });
+  assert.ok(e.some(m => m.includes('community.ppomppu[0].points')) && e.some(m => m.includes('community.ppomppu[0].discussUrl')));
+});
+test('community null points ok, unknown key rejected', () => {
+  const g = { title: 'a', points: null, summary: 's', url: 'https://a', discussUrl: null };
+  assert.deepEqual(validateBriefing({ ...sample, community: { ruliweb: [g], '82cook': [] } }), []);
+  assert.ok(validateBriefing({ ...sample, community: { clien: [] } }).some(m => m.includes('clien')));
+});
+test('geeknews no longer required', () => {
+  const { geeknews, ...rest } = sample;
+  assert.deepEqual(validateBriefing(rest), []);
 });
 test('not object', () => assert.ok(validateBriefing(null).length > 0));

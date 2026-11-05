@@ -51,13 +51,15 @@
   "generatedAt": "2026-11-06T05:31:00+09:00",
   "news": { "경제": [{ "title": "...", "summary": "...", "url": "https://..." }] },
   "advice": { "good": { "friend": "...", "coach": "...", "quote": "...", "action": "..." } },
-  "geeknews": [{ "title": "...", "points": 42, "summary": "...", "url": "https://...", "discussUrl": "https://news.hada.io/topic?id=..." }]
+  "community": { "geeknews": [Item], "ppomppu": [Item], "ruliweb": [Item], "82cook": [Item] }
+  // Item = { "title": "...", "points": 42 또는 null, "summary": "...", "url": "https://...", "discussUrl": "https://..." 또는 null(GeekNews만 값) }
+  // 앱은 옛 최상위 "geeknews"도 community.geeknews로 받아들인다
 }
 ```
 - 주제(`TOPICS`, 순서 고정): `경제, 재테크, 세무, 부동산, 건강, IT, 정치, 사회, 국제, 과학, 스포츠, 연예`
 - 기분 키: `good`😊좋음, `tired`😴피곤, `worried`😟걱정, `down`😢우울, `eager`🔥의욕
 - 말투 키: `friend` 다정한 친구, `coach` 짧고 힘 있는 코치, `quote` 명언 인용, `action` 오늘 해 볼 작은 행동
-- 각 주제·geeknews는 0~10개, advice는 5×4 전부 채움.
+- 각 주제·커뮤니티는 0~10개, advice는 5×4 전부 채움.
 
 ---
 

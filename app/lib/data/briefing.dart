@@ -1,3 +1,13 @@
+typedef Community = ({String key, String label, String pointsLabel});
+
+/// 홈 커뮤니티 카드 순서이자 설정 목록. pointsLabel: '점'은 숫자 뒤, 나머지는 숫자 앞에 붙는다.
+const List<Community> kCommunities = [
+  (key: 'geeknews', label: 'GeekNews', pointsLabel: '점'),
+  (key: 'ppomppu', label: '뽐뿌', pointsLabel: '추천'),
+  (key: 'ruliweb', label: '루리웹', pointsLabel: '추천'),
+  (key: '82cook', label: '82cook', pointsLabel: '조회'),
+];
+
 const kTopics = ['경제', '재테크', '세무', '부동산', '건강', 'IT', '정치', '사회', '국제', '과학', '스포츠', '연예'];
 
 typedef Mood = ({String key, String emoji, String label});
@@ -27,27 +37,32 @@ class NewsItem {
       j['url'] as String? ?? '');
 }
 
-class GeekItem {
-  final String title, summary, url, discussUrl;
-  final int points;
-  const GeekItem(this.title, this.points, this.summary, this.url, this.discussUrl);
-  factory GeekItem.fromJson(Map<String, dynamic> j) => GeekItem(
+class CommunityItem {
+  final String title, summary, url;
+  final int? points;
+  final String? discussUrl;
+  const CommunityItem(this.title, this.points, this.summary, this.url, [this.discussUrl]);
+  factory CommunityItem.fromJson(Map<String, dynamic> j) => CommunityItem(
       j['title'] as String? ?? '',
-      (j['points'] as num?)?.toInt() ?? 0,
+      (j['points'] as num?)?.toInt(),
       j['summary'] as String? ?? '',
       j['url'] as String? ?? '',
-      j['discussUrl'] as String? ?? '');
+      j['discussUrl'] as String?);
 }
 
 class Briefing {
   final String date;
   final Map<String, List<NewsItem>> news;
   final Map<String, Map<String, String>> advice;
-  final List<GeekItem> geeknews;
-  const Briefing(this.date, this.news, this.advice, this.geeknews);
+  final Map<String, List<CommunityItem>> community;
+  const Briefing(this.date, this.news, this.advice, this.community);
+
+  List<CommunityItem> get geeknews => community['geeknews'] ?? const [];
 
   static Briefing fromJson(Map<String, dynamic> j) {
     final rawNews = (j['news'] as Map?) ?? {};
+    // 옛 파일: 최상위 geeknews만 있으면 community.geeknews로 본다.
+    final rawCom = (j['community'] as Map?) ?? {'geeknews': j['geeknews']};
     final rawAdvice = (j['advice'] as Map?) ?? {};
     return Briefing(
       j['date'] as String? ?? '',
@@ -66,10 +81,14 @@ class Briefing {
               t.key as String: t.value as String
           }
       },
-      [
-        for (final e in (j['geeknews'] as List?) ?? const [])
-          GeekItem.fromJson(Map<String, dynamic>.from(e as Map))
-      ],
+      {
+        for (final c in kCommunities)
+          if (rawCom[c.key] is List)
+            c.key: [
+              for (final e in rawCom[c.key] as List)
+                CommunityItem.fromJson(Map<String, dynamic>.from(e as Map))
+            ]
+      },
     );
   }
 }

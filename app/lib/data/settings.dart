@@ -8,12 +8,13 @@ import 'youtube.dart';
 
 class Settings {
   Place? home, work;
-  List<String> topics;
+  List<String> topics, communities;
   String tone;
   String? moodToday, moodDate;
   List<YtChannel> channels;
-  Settings({this.home, this.work, List<String>? topics, this.tone = 'friend', this.moodToday, this.moodDate, List<YtChannel>? channels})
+  Settings({this.home, this.work, List<String>? topics, List<String>? communities, this.tone = 'friend', this.moodToday, this.moodDate, List<YtChannel>? channels})
       : topics = topics ?? ['경제', 'IT', '건강'],
+        communities = communities ?? ['geeknews'],
         channels = channels ?? [];
 }
 
@@ -34,6 +35,7 @@ class SettingsStore {
         home: pl('home'),
         work: pl('work'),
         topics: (j['topics'] as List?)?.cast<String>(),
+        communities: (j['communities'] as List?)?.cast<String>(),
         tone: j['tone'] as String? ?? 'friend',
         moodToday: fresh ? j['moodToday'] as String? : null,
         moodDate: fresh ? j['moodDate'] as String? : null,
@@ -53,6 +55,7 @@ class SettingsStore {
         'home': s.home?.toJson(),
         'work': s.work?.toJson(),
         'topics': s.topics,
+        'communities': s.communities,
         'tone': s.tone,
         'moodToday': s.moodToday,
         'moodDate': s.moodDate,

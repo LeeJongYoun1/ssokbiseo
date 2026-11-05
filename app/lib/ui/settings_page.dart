@@ -70,6 +70,17 @@ class _SettingsPageState extends State<SettingsPage> {
                 }),
               ),
           ]),
+          CardShell('커뮤니티', [
+            for (final c in kCommunities)
+              CheckboxListTile(
+                title: Text(c.label, style: const TextStyle(fontSize: 17)),
+                value: _s.communities.contains(c.key),
+                onChanged: (v) => setState(() => _s.communities = [
+                      for (final k in kCommunities)
+                        if (k.key == c.key ? v == true : _s.communities.contains(k.key)) k.key
+                    ]),
+              ),
+          ]),
           CardShell('유튜브 채널', [
             for (final c in _s.channels)
               ListTile(

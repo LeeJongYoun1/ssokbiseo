@@ -14,6 +14,8 @@ void main() {
     expect(b.date, '2026-11-06');
     expect(b.news['경제']!.first.title, isNotEmpty);
     expect(b.advice['tired']!['coach'], isNotEmpty);
+    expect(b.community['ppomppu']!.first.points, isNotNull);
+    expect(b.community['ppomppu']!.first.discussUrl, isNull);
     expect(b.geeknews.length, 3);
     expect(b.geeknews.first.discussUrl, startsWith('https://news.hada.io'));
   });
@@ -26,8 +28,16 @@ void main() {
     expect(Briefing.fromJson(j).news.containsKey('낚시'), false);
   });
 
-  test('missing geeknews/news tolerated', () {
-    final j = load()..remove('geeknews')..remove('news');
+  test('legacy top-level geeknews maps to community', () {
+    final j = load();
+    j['geeknews'] = (j.remove('community') as Map)['geeknews'];
+    final b = Briefing.fromJson(j);
+    expect(b.geeknews.length, 3);
+    expect(b.community['ppomppu'], isNull);
+  });
+
+  test('missing community/news tolerated', () {
+    final j = load()..remove('community')..remove('news');
     final b = Briefing.fromJson(j);
     expect(b.geeknews, isEmpty);
     expect(b.news, isEmpty);

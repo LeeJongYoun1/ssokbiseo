@@ -1,4 +1,5 @@
 export const TOPICS = ['경제', '재테크', '세무', '부동산', '건강', 'IT', '정치', '사회', '국제', '과학', '스포츠', '연예'];
+export const COMMUNITIES = ['geeknews', 'ppomppu', 'ruliweb', '82cook'];
 export const MOODS = ['good', 'tired', 'worried', 'down', 'eager'];
 export const TONES = ['friend', 'coach', 'quote', 'action'];
 
@@ -35,15 +36,19 @@ export function validateBriefing(b) {
     for (const t of TONES) if (!str(a[t])) errs.push(`advice.${m}.${t}: 비어 있습니다`);
   }
 
-  if (!Array.isArray(b.geeknews) || b.geeknews.length > 10) errs.push('geeknews: 0~10개 배열이어야 합니다');
-  else b.geeknews.forEach((g, i) => {
-    const p = `geeknews[${i}]`;
-    if (!isObj(g)) return errs.push(`${p}: 객체가 아닙니다`);
-    if (!str(g.title)) errs.push(`${p}.title: 비어 있습니다`);
-    if (typeof g.points !== 'number' || !Number.isFinite(g.points)) errs.push(`${p}.points: 숫자여야 합니다`);
-    if (!str(g.summary)) errs.push(`${p}.summary: 비어 있습니다`);
-    if (!https(g.url)) errs.push(`${p}.url: https:// 로 시작해야 합니다`);
-    if (!https(g.discussUrl)) errs.push(`${p}.discussUrl: https:// 로 시작해야 합니다`);
-  });
+  if (!isObj(b.community)) errs.push('community: 객체가 아닙니다');
+  else for (const [key, arr] of Object.entries(b.community)) {
+    if (!COMMUNITIES.includes(key)) { errs.push(`community.${key}: 알 수 없는 커뮤니티`); continue; }
+    if (!Array.isArray(arr) || arr.length > 10) { errs.push(`community.${key}: 0~10개 배열이어야 합니다`); continue; }
+    arr.forEach((g, i) => {
+      const p = `community.${key}[${i}]`;
+      if (!isObj(g)) return errs.push(`${p}: 객체가 아닙니다`);
+      if (!str(g.title)) errs.push(`${p}.title: 비어 있습니다`);
+      if (g.points !== null && (typeof g.points !== 'number' || !Number.isFinite(g.points))) errs.push(`${p}.points: 숫자 또는 null이어야 합니다`);
+      if (!str(g.summary)) errs.push(`${p}.summary: 비어 있습니다`);
+      if (!https(g.url)) errs.push(`${p}.url: https:// 로 시작해야 합니다`);
+      if (g.discussUrl !== null && !https(g.discussUrl)) errs.push(`${p}.discussUrl: null 또는 https:// 로 시작해야 합니다`);
+    });
+  }
   return errs;
 }

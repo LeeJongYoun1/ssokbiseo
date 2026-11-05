@@ -104,6 +104,7 @@ void main() {
     test('defaults', () async {
       final s = SettingsStore(await prefs(), now: today).load();
       expect(s.topics, ['경제', 'IT', '건강']);
+      expect(s.communities, ['geeknews']);
       expect((s.tone, s.home), ('friend', null));
     });
     test('round trip + mood valid only today (KST)', () async {
@@ -115,6 +116,16 @@ void main() {
       final tomorrow = SettingsStore(p, now: () => today().add(const Duration(days: 1)));
       expect(tomorrow.load().moodToday, isNull);
       expect(tomorrow.load().home!.address, '서울');
+    });
+    test('communities round trip; legacy saved settings -> default', () async {
+      final p = await prefs();
+      final st = SettingsStore(p, now: today);
+      await st.save(Settings(communities: ['ppomppu', '82cook']));
+      expect(st.load().communities, ['ppomppu', '82cook']);
+      p.setString('settings_json', '{"topics":["IT"],"tone":"coach"}');
+      expect(st.load().communities, ['geeknews']);
+      await st.save(Settings(communities: []));
+      expect(st.load().communities, isEmpty);
     });
   });
 }
