@@ -40,26 +40,38 @@ class NewsCard extends StatelessWidget {
       ], stale: stale);
 }
 
-class GeekNewsCard extends StatelessWidget {
+class CommunityCard extends StatelessWidget {
   final Future<Briefing?> briefing;
   final bool stale;
   final ShareText share;
-  const GeekNewsCard(this.briefing, this.stale, {this.share = shareText, super.key});
+  const CommunityCard(this.briefing, this.stale, {this.share = shareText, super.key});
 
   @override
-  Widget build(BuildContext context) => CardShell('GeekNews', [
+  Widget build(BuildContext context) => CardShell('커뮤니티', [
         CardFuture<Briefing?>(briefing, '글을 불러오지 못했어요', (b) {
           if (b == null) return bodyText('글을 불러오지 못했어요');
-          if (b.geeknews.isEmpty) return bodyText('오늘은 글이 없어요');
+          // 다른 커뮤니티는 이 목록에 (이름, 글 목록)만 더하면 된다.
+          final sections = [('GeekNews', b.geeknews)];
           return Column(children: [
-            for (final g in b.geeknews)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(g.title, style: const TextStyle(fontSize: 17)),
-                subtitle: Text('${g.points}점'),
-                onTap: () => showDetail(context, g.title, g.summary,
-                    [('원문 보기', g.url), ('토론 보기', g.discussUrl)],
-                    share: share),
+            for (final (label, items) in sections)
+              ExpansionTile(
+                title: Text(items.isEmpty ? label : '$label (${items.length})',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                tilePadding: EdgeInsets.zero,
+                shape: const Border(),
+                collapsedShape: const Border(),
+                children: [
+                  if (items.isEmpty) bodyText('오늘은 소식이 없어요'),
+                  for (final g in items)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(g.title, style: const TextStyle(fontSize: 17)),
+                      subtitle: Text('${g.points}점'),
+                      onTap: () => showDetail(context, g.title, g.summary,
+                          [('원문 보기', g.url), ('토론 보기', g.discussUrl)],
+                          share: share),
+                    ),
+                ],
               ),
           ]);
         }),

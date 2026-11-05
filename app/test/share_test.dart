@@ -15,6 +15,7 @@ Future<void> _open(WidgetTester t, Widget Function(ShareText) card, ShareText s,
   await t.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(child: card(s)))));
   await t.pumpAndSettle();
   if (tap == '제목') await t.tap(find.text('IT'));
+  if (tap == '긱') await t.tap(find.text('GeekNews (1)'));
   await t.pumpAndSettle();
   await t.tap(find.text(tap));
   await t.pumpAndSettle();
@@ -33,14 +34,26 @@ void main() {
 
   testWidgets('GeekNews 공유: discussUrl 아닌 url', (t) async {
     String? got;
-    await _open(t, (ShareText s) => GeekNewsCard(Future.value(_b), false, share: s),
+    await _open(t, (ShareText s) => CommunityCard(Future.value(_b), false, share: s),
         (x, {subject}) async { got = x; }, '긱');
     expect(got, '긱\n긱요약\nhttps://g.com/o');
     expect(find.text('토론 보기'), findsOneWidget);
   });
 
+  testWidgets('커뮤니티: 접힘 -> 펼치면 제목, 어제 표시', (t) async {
+    await t.pumpWidget(MaterialApp(
+        home: Scaffold(body: SingleChildScrollView(child: CommunityCard(Future.value(_b), true)))));
+    await t.pumpAndSettle();
+    expect(find.text('커뮤니티'), findsOneWidget);
+    expect(find.text('어제 내용이에요'), findsOneWidget);
+    expect(find.text('긱'), findsNothing);
+    await t.tap(find.text('GeekNews (1)'));
+    await t.pumpAndSettle();
+    expect(find.text('긱'), findsOneWidget);
+  });
+
   testWidgets('공유 실패 -> 안내', (t) async {
-    await _open(t, (ShareText s) => GeekNewsCard(Future.value(_b), false, share: s),
+    await _open(t, (ShareText s) => CommunityCard(Future.value(_b), false, share: s),
         (x, {subject}) async => throw Exception('x'), '긱');
     expect(find.text('공유하지 못했어요'), findsOneWidget);
   });
