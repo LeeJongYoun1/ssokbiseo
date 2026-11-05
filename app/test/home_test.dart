@@ -68,6 +68,13 @@ Future<void> pump(WidgetTester t,
   await t.pumpAndSettle();
 }
 
+const work = Place('회사', '서울', 37.6, 127.0);
+final wx = {'/api/weather': {'tempC': 10, 'sky': '맑음', 'rain': '없음', 'popMax': 0, 'tmin': null, 'tmax': null}};
+List<String> wrows(WidgetTester t) => [
+      for (final w in t.widgetList<Text>(find.textContaining('강수확률')))
+        w.data!.split(' ').first
+    ];
+
 void main() {
   setUp(() => TestWidgetsFlutterBinding.ensureInitialized());
 
@@ -142,5 +149,28 @@ void main() {
     expect(find.byType(SettingsPage), findsNothing);
     expect(find.text('건강'), findsNothing);
     expect(find.text('경제'), findsOneWidget);
+  });
+
+  testWidgets('집·회사에서 10km 밖 -> 내 위치, 집, 회사 순', (t) async {
+    await pump(t, routes: wx, settings: Settings(home: home, work: work), loc: FakeLoc((36.0, 127.0)));
+    expect(wrows(t), ['내', '집', '회사']);
+  });
+
+  testWidgets('집 10km 안 -> 집, 회사만', (t) async {
+    await pump(t, routes: wx, settings: Settings(home: home, work: work), loc: FakeLoc((37.52, 127.0)));
+    expect(wrows(t), ['집', '회사']);
+  });
+
+  testWidgets('위치 없음 -> 집, 회사만, 날씨 카드가 권한을 묻지 않음', (t) async {
+    await pump(t, routes: wx, settings: Settings(home: home, work: work), loc: FakeLoc(null));
+    expect(wrows(t), ['집', '회사']);
+    // 권한 안내는 길찾기 카드 한 곳뿐
+    expect(find.text('권한을 허용하면 볼 수 있어요'), findsOneWidget);
+  });
+
+  testWidgets('집·회사 미등록 + 위치 있음 -> 내 위치와 안내', (t) async {
+    await pump(t, routes: wx);
+    expect(wrows(t), ['내']);
+    expect(find.text('설정에서 집·회사를 등록해 주세요'), findsNWidgets(2));
   });
 }

@@ -60,9 +60,11 @@ class _HomePageState extends State<HomePage> {
       if (mounted) setState(() => _stale = r.stale);
       return r.briefing;
     });
-    _weather = hasPlace ? loadWeather(widget.api, _s.home, _s.work) : null;
+    final loc = _OnceLoc(widget.location); // 날씨·길찾기가 GPS 한 번만 쓰도록
+    _weather = loadWeather(widget.api, _s.home, _s.work, loc.current());
+    _weather!.ignore(); // 카드가 떼어진 뒤 늦게 실패해도 무시
     _route = hasPlace
-        ? loadRoutes(widget.api, widget.location, _s.home, _s.work)
+        ? loadRoutes(widget.api, loc, _s.home, _s.work)
         : null;
     _cal = widget.calendar.today();
   }
@@ -127,7 +129,7 @@ class _HomePageState extends State<HomePage> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.only(bottom: 24),
         children: [
-          WeatherCard(_weather),
+          WeatherCard(_weather, needPlaces: _s.home == null && _s.work == null),
           ScheduleCard(_cal, () => _allow(widget.calendar.request)),
           RouteCard(_route, () => _allow(widget.location.request)),
           MoodCard(_b, _stale, _s.moodToday, _s.tone, _pick),
@@ -138,4 +140,17 @@ class _HomePageState extends State<HomePage> {
     )),
     ]),
   );
+}
+
+/// current()를 한 번만 부르고 결과를 나눠 쓴다
+class _OnceLoc extends LocationSource {
+  final LocationSource _l;
+  _OnceLoc(this._l);
+  Future<(double, double)?>? _cur;
+  @override
+  Future<(double, double)?> current() => _cur ??= _l.current();
+  @override
+  Future<bool> serviceOn() => _l.serviceOn();
+  @override
+  Future<bool> request() => _l.request();
 }
