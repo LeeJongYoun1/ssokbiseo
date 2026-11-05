@@ -4,14 +4,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'kst.dart';
 import 'server_api.dart';
+import 'youtube.dart';
 
 class Settings {
   Place? home, work;
   List<String> topics;
   String tone;
   String? moodToday, moodDate;
-  Settings({this.home, this.work, List<String>? topics, this.tone = 'friend', this.moodToday, this.moodDate})
-      : topics = topics ?? ['경제', 'IT', '건강'];
+  List<YtChannel> channels;
+  Settings({this.home, this.work, List<String>? topics, this.tone = 'friend', this.moodToday, this.moodDate, List<YtChannel>? channels})
+      : topics = topics ?? ['경제', 'IT', '건강'],
+        channels = channels ?? [];
 }
 
 class SettingsStore {
@@ -34,6 +37,10 @@ class SettingsStore {
         tone: j['tone'] as String? ?? 'friend',
         moodToday: fresh ? j['moodToday'] as String? : null,
         moodDate: fresh ? j['moodDate'] as String? : null,
+        channels: [
+          for (final c in (j['channels'] as List? ?? const []))
+            YtChannel.fromJson(Map<String, dynamic>.from(c as Map))
+        ],
       );
     } catch (_) {
       return Settings(); // 깨진 저장값은 기본값으로
@@ -49,5 +56,6 @@ class SettingsStore {
         'tone': s.tone,
         'moodToday': s.moodToday,
         'moodDate': s.moodDate,
+        'channels': [for (final c in s.channels) c.toJson()],
       }));
 }

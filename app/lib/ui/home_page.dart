@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../data/briefing.dart';
 import '../data/briefing_repo.dart';
@@ -7,10 +8,13 @@ import '../data/kst.dart';
 import '../data/location.dart';
 import '../data/server_api.dart';
 import '../data/settings.dart';
+import '../data/youtube.dart';
 import 'cards/mood_card.dart';
 import 'cards/news_card.dart';
 import 'cards/route_card.dart';
 import 'cards/schedule_card.dart';
+import 'cards/shell.dart';
+import 'cards/youtube_card.dart';
 import 'cards/weather_card.dart';
 import 'settings_page.dart';
 import 'theme.dart';
@@ -22,6 +26,8 @@ class HomePage extends StatefulWidget {
   final CalendarSource calendar;
   final LocationSource location;
   final bool demo;
+  final YoutubeSource? youtube;
+  final Future<bool> Function(String) openUrl;
   const HomePage({
     super.key,
     required this.briefingRepo,
@@ -30,6 +36,8 @@ class HomePage extends StatefulWidget {
     required this.calendar,
     required this.location,
     this.demo = false,
+    this.youtube,
+    this.openUrl = openExternal,
   });
 
   @override
@@ -43,6 +51,8 @@ class _HomePageState extends State<HomePage> {
   late Future<WeatherRows>? _weather;
   late Future<List<Event>?> _cal;
   late Future<List<Leg>?>? _route;
+  late Future<ChannelVideos?>? _yt;
+  late final YoutubeSource _ytSrc = widget.youtube ?? YoutubeSource(http.Client());
   bool _stale = false;
 
   @override
@@ -67,13 +77,15 @@ class _HomePageState extends State<HomePage> {
         ? loadRoutes(widget.api, loc, _s.home, _s.work)
         : null;
     _cal = widget.calendar.today();
+    _yt = _s.channels.isEmpty ? null : _ytSrc.newVideos(_s.channels, DateTime.now());
+    _yt?.ignore();
   }
 
   Future<void> _refresh() async {
     setState(_load);
     // 실패해도 새로고침 표시는 끝나야 한다
     await Future.wait([
-      for (final f in <Future?>[_br, _weather, _route, _cal])
+      for (final f in <Future?>[_br, _weather, _route, _cal, _yt])
         if (f != null) f.then((_) {}, onError: (_) {}),
     ]);
   }
@@ -94,7 +106,7 @@ class _HomePageState extends State<HomePage> {
     final changed = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (_) => SettingsPage(api: widget.api, store: widget.store),
+        builder: (_) => SettingsPage(api: widget.api, store: widget.store, youtube: _ytSrc),
       ),
     );
     if (changed == true && mounted) setState(_load);
@@ -134,6 +146,7 @@ class _HomePageState extends State<HomePage> {
           RouteCard(_route, () => _allow(widget.location.request)),
           MoodCard(_b, _stale, _s.moodToday, _s.tone, _pick),
           NewsCard(_b, _stale, _s.topics),
+          YoutubeCard(_yt, open: widget.openUrl),
           GeekNewsCard(_b, _stale),
         ],
       ),
