@@ -1,9 +1,10 @@
 # 쏙비서 테스트용 APK
 
-- 최신: [ssokbiseo-demo-1.0.7.apk](https://github.com/LeeJongYoun1/ssokbiseo/raw/apk/ssokbiseo-demo-1.0.7.apk) — 예시 모드(서버 연결 전). 날씨·길찾기·뉴스는 예시 값, 일정·위치는 실제.
+- 최신: [ssokbiseo-demo-1.0.8.apk](https://github.com/LeeJongYoun1/ssokbiseo/raw/apk/ssokbiseo-demo-1.0.8.apk) — 예시 모드(서버 연결 전). 날씨·길찾기·뉴스는 예시 값, 일정·위치는 실제.
 - 안드로이드 전용. 쏙메모와 같은 키로 서명, 쏙메모와 따로 설치됨.
 
 ## 바뀐 점
+- 1.0.8: 홈 화면을 쓸어내릴 때 걸리던 문제, 맨 아래가 하단 버튼에 가려지던 문제 수정
 - 1.0.7: 세무 소식 칸(세정일보, 국세청 보도자료·공지사항), 설정에서 선택
 - 1.0.6: 커뮤니티에 뽐뿌·루리웹·82cook 추가, 설정에서 볼 커뮤니티 선택
 - 1.0.5: 채널 추가 화면 — 설명을 입력칸 위로, 복사한 주소 붙여넣기 버튼
