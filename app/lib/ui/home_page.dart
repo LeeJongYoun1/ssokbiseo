@@ -12,6 +12,7 @@ import 'cards/news_card.dart';
 import 'cards/route_card.dart';
 import 'cards/schedule_card.dart';
 import 'cards/weather_card.dart';
+import 'settings_page.dart';
 
 class HomePage extends StatefulWidget {
   final BriefingRepo briefingRepo;
@@ -57,7 +58,9 @@ class _HomePageState extends State<HomePage> {
       return r.briefing;
     });
     _weather = hasPlace ? loadWeather(widget.api, _s.home, _s.work) : null;
-    _route = hasPlace ? loadRoutes(widget.api, widget.location, _s.home, _s.work) : null;
+    _route = hasPlace
+        ? loadRoutes(widget.api, widget.location, _s.home, _s.work)
+        : null;
     _cal = widget.calendar.today();
   }
 
@@ -82,26 +85,45 @@ class _HomePageState extends State<HomePage> {
     await widget.store.save(_s);
   }
 
+  Future<void> _openSettings() async {
+    final changed = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SettingsPage(api: widget.api, store: widget.store),
+      ),
+    );
+    if (changed == true && mounted) setState(_load);
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('쏙비서',
-              style: TextStyle(fontFamily: 'JuaTitle', fontSize: 28)),
+    appBar: AppBar(
+      title: const Text(
+        '쏙비서',
+        style: TextStyle(fontFamily: 'JuaTitle', fontSize: 28),
+      ),
+      actions: [
+        IconButton(
+          tooltip: '설정',
+          icon: const Icon(Icons.settings, size: 28),
+          onPressed: _openSettings,
         ),
-        body: RefreshIndicator(
-          onRefresh: _refresh,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(bottom: 24),
-            children: [
-              WeatherCard(_weather),
-              ScheduleCard(_cal, () => _allow(widget.calendar.request)),
-              RouteCard(_route, () => _allow(widget.location.request)),
-              MoodCard(_b, _stale, _s.moodToday, _s.tone, _pick),
-              NewsCard(_b, _stale, _s.topics),
-              GeekNewsCard(_b, _stale),
-            ],
-          ),
-        ),
-      );
+      ],
+    ),
+    body: RefreshIndicator(
+      onRefresh: _refresh,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 24),
+        children: [
+          WeatherCard(_weather),
+          ScheduleCard(_cal, () => _allow(widget.calendar.request)),
+          RouteCard(_route, () => _allow(widget.location.request)),
+          MoodCard(_b, _stale, _s.moodToday, _s.tone, _pick),
+          NewsCard(_b, _stale, _s.topics),
+          GeekNewsCard(_b, _stale),
+        ],
+      ),
+    ),
+  );
 }
