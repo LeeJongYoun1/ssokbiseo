@@ -143,7 +143,8 @@ class _HomePageState extends State<HomePage> {
         physics: const AlwaysScrollableScrollPhysics(),
         // 3버튼 내비 바 아래로 마지막 카드가 들어가지 않게
         padding: EdgeInsets.only(bottom: 24 + MediaQuery.paddingOf(context).bottom),
-        child: Column(children: [
+        // stretch: Column은 카드를 내용 폭에 맞춰 가운데 둔다(ListView와 달리)
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           WeatherCard(_weather, needPlaces: _s.home == null && _s.work == null),
           ScheduleCard(_cal, () => _allow(widget.calendar.request)),
           RouteCard(_route, () => _allow(widget.location.request)),

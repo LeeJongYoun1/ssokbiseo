@@ -199,4 +199,10 @@ void main() {
     final navTop = screenH - 144 / t.view.devicePixelRatio;
     expect(t.getRect(find.byType(Card).last).bottom, lessThanOrEqualTo(navTop));
   });
+
+  testWidgets('모든 카드의 가로 폭이 같다', (t) async {
+    await pump(t);
+    final widths = find.byType(Card).evaluate().map((e) => t.getSize(find.byWidget(e.widget)).width).toSet();
+    expect(widths.length, 1);
+  });
 }
