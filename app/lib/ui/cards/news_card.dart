@@ -1,0 +1,62 @@
+import 'package:flutter/material.dart';
+
+import '../../data/briefing.dart';
+import 'shell.dart';
+
+class NewsCard extends StatelessWidget {
+  final Future<Briefing?> briefing;
+  final bool stale;
+  final List<String> topics;
+  const NewsCard(this.briefing, this.stale, this.topics, {super.key});
+
+  @override
+  Widget build(BuildContext context) => CardShell('관심 뉴스', [
+        CardFuture<Briefing?>(briefing, '뉴스를 불러오지 못했어요', (b) {
+          if (b == null) return bodyText('뉴스를 불러오지 못했어요');
+          return Column(children: [
+            for (final t in kTopics.where(topics.contains))
+              ExpansionTile(
+                title: Text(t,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                tilePadding: EdgeInsets.zero,
+                shape: const Border(),
+                collapsedShape: const Border(),
+                children: [
+                  if ((b.news[t] ?? []).isEmpty) bodyText('오늘은 소식이 없어요'),
+                  for (final n in b.news[t] ?? [])
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(n.title, style: const TextStyle(fontSize: 17)),
+                      onTap: () =>
+                          showDetail(context, n.title, n.summary, [('원문 보기', n.url)]),
+                    ),
+                ],
+              ),
+          ]);
+        }),
+      ], stale: stale);
+}
+
+class GeekNewsCard extends StatelessWidget {
+  final Future<Briefing?> briefing;
+  final bool stale;
+  const GeekNewsCard(this.briefing, this.stale, {super.key});
+
+  @override
+  Widget build(BuildContext context) => CardShell('GeekNews', [
+        CardFuture<Briefing?>(briefing, '글을 불러오지 못했어요', (b) {
+          if (b == null) return bodyText('글을 불러오지 못했어요');
+          if (b.geeknews.isEmpty) return bodyText('오늘은 글이 없어요');
+          return Column(children: [
+            for (final g in b.geeknews)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(g.title, style: const TextStyle(fontSize: 17)),
+                subtitle: Text('${g.points}점'),
+                onTap: () => showDetail(context, g.title, g.summary,
+                    [('원문 보기', g.url), ('토론 보기', g.discussUrl)]),
+              ),
+          ]);
+        }),
+      ], stale: stale);
+}
