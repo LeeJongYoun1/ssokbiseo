@@ -1,4 +1,5 @@
 import 'package:device_calendar/device_calendar.dart';
+import 'package:geolocator/geolocator.dart' show Geolocator;
 import 'package:timezone/timezone.dart' as tz;
 
 export 'package:device_calendar/device_calendar.dart' show Event;
@@ -13,8 +14,13 @@ class DeviceCalendarSource extends CalendarSource {
   final _p = DeviceCalendarPlugin();
 
   @override
-  Future<bool> request() async =>
-      (await _p.requestPermissions()).data ?? false;
+  Future<bool> request() async {
+    final t = Stopwatch()..start();
+    final ok = (await _p.requestPermissions()).data ?? false;
+    // shortcut: 거부가 영구인지 알 방법이 없어, 창 없이 즉시 false면 영구 거부로 보고 설정을 연다
+    if (!ok && t.elapsedMilliseconds < 300) await Geolocator.openAppSettings();
+    return ok;
+  }
 
   @override
   Future<List<Event>?> today() async {

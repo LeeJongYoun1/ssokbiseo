@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'config.dart';
 import 'data/briefing_repo.dart';
 import 'data/calendar.dart';
 import 'data/location.dart';
@@ -14,6 +15,7 @@ import 'ui/theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  warnIfConfigMissing();
   LicenseRegistry.addLicense(() async* {
     yield LicenseEntryWithLineBreaks(
         ['Jua'], await rootBundle.loadString('assets/fonts/OFL.txt'));

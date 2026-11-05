@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../theme.dart';
 
 const kNeedPlaces = '설정에서 집·회사를 등록해 주세요';
+const kNeedGps = '위치(GPS)를 켜 주세요';
 const kNeedPermission = '권한을 허용하면 볼 수 있어요';
 
 Future<bool> openExternal(String url) async {
@@ -47,14 +48,15 @@ Widget bodyText(String s) => Padding(
 class CardFuture<T> extends StatelessWidget {
   final Future<T> future;
   final String error;
+  final Widget? Function(Object)? errorFor; // 오류 종류별 위젯(null이면 기본 문구)
   final Widget Function(T) builder;
-  const CardFuture(this.future, this.error, this.builder, {super.key});
+  const CardFuture(this.future, this.error, this.builder, {this.errorFor, super.key});
 
   @override
   Widget build(BuildContext context) => FutureBuilder<T>(
         future: future,
         builder: (_, s) {
-          if (s.hasError) return bodyText(error);
+          if (s.hasError) return errorFor?.call(s.error!) ?? bodyText(error);
           if (s.connectionState != ConnectionState.done) {
             return const Padding(
                 padding: EdgeInsets.all(8),
@@ -74,7 +76,7 @@ void showDetail(BuildContext context, String title, String summary,
     builder: (_) => SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(
+        child: SingleChildScrollView(child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -87,7 +89,7 @@ void showDetail(BuildContext context, String title, String summary,
                   if (l.$2.isNotEmpty)
                     FilledButton(onPressed: () => openExternal(l.$2), child: Text(l.$1)),
               ]),
-            ]),
+            ])),
       ),
     ),
   );

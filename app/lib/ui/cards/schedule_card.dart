@@ -8,10 +8,11 @@ String _hm(DateTime d) =>
 
 class PermissionPrompt extends StatelessWidget {
   final VoidCallback onAllow;
-  const PermissionPrompt(this.onAllow, {super.key});
+  final String text;
+  const PermissionPrompt(this.onAllow, {this.text = kNeedPermission, super.key});
   @override
   Widget build(BuildContext context) => Row(children: [
-        Expanded(child: bodyText(kNeedPermission)),
+        Expanded(child: bodyText(text)),
         FilledButton(onPressed: onAllow, child: const Text('허용')),
       ]);
 }

@@ -11,7 +11,10 @@ typedef Leg = (String, Place, Place, RouteTime);
 Future<List<Leg>?> loadRoutes(
     ServerApi api, LocationSource loc, Place? home, Place? work) async {
   final here = await loc.current();
-  if (here == null) return null;
+  if (here == null) {
+    if (!await loc.serviceOn()) throw const GpsOff();
+    return null;
+  }
   final from = Place('현재 위치', '', here.$1, here.$2);
   return Future.wait([
     for (final e in [('집', home), ('회사', work)])
@@ -39,15 +42,18 @@ class RouteCard extends StatelessWidget {
         if (future == null)
           bodyText(kNeedPlaces)
         else
-          CardFuture<List<Leg>?>(future!, '시간을 불러오지 못했어요', (l) {
+          CardFuture<List<Leg>?>(future!, '시간을 불러오지 못했어요',
+              errorFor: (e) => e is GpsOff ? PermissionPrompt(onAllow, text: kNeedGps) : null, (l) {
             if (l == null) return PermissionPrompt(onAllow);
             return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               for (final (name, from, to, r) in l)
                 Row(children: [
                   Expanded(
-                      child: bodyText('$name까지  '
-                          '🚗 ${r.carMin == null ? '-' : '${r.carMin}분'} · '
-                          '🚌 ${r.transitMin == null ? '' : '${r.transitMin}분'}')),
+                      child: InkWell(
+                          onTap: () => openKakao(from, to, 'PUBTRANS'),
+                          child: bodyText('$name까지  '
+                              '🚗 ${r.carMin == null ? '-' : '${r.carMin}분'} · '
+                              '🚌 ${r.transitBlocked ? '오늘은 확인할 수 없어요' : r.transitMin == null ? '' : '${r.transitMin}분'}'))),
                   if (r.transitMin == null)
                     TextButton(
                         onPressed: () => openKakao(from, to, 'PUBTRANS'),

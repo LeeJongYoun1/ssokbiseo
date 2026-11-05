@@ -23,7 +23,10 @@ class FakeCal extends CalendarSource {
 
 class FakeLoc extends LocationSource {
   final (double, double)? v;
-  FakeLoc(this.v);
+  final bool gps;
+  FakeLoc(this.v, {this.gps = true});
+  @override
+  Future<bool> serviceOn() async => gps;
   @override
   Future<(double, double)?> current() async => v;
 }
@@ -93,6 +96,12 @@ void main() {
     expect(find.text('허용'), findsOneWidget);
   });
 
+  testWidgets('GPS 꺼짐 -> 위치(GPS)를 켜 주세요', (t) async {
+    await pump(t, settings: Settings(home: home), loc: FakeLoc(null, gps: false));
+    expect(find.text('위치(GPS)를 켜 주세요'), findsOneWidget);
+    expect(find.text('권한을 허용하면 볼 수 있어요'), findsNothing);
+  });
+
   testWidgets('😴 누르면 coach 조언', (t) async {
     final advice = (jsonDecode(fixture)['advice']['tired']['coach']) as String;
     await pump(t, settings: Settings(tone: 'coach'));
@@ -110,6 +119,7 @@ void main() {
         });
     expect(find.text('카카오맵에서 보기'), findsOneWidget);
     expect(find.textContaining('🚗 25분'), findsOneWidget);
+    expect(find.textContaining('🚌 오늘은 확인할 수 없어요'), findsOneWidget);
   });
 
   testWidgets('stale -> 어제 내용이에요', (t) async {
