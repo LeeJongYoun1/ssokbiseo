@@ -173,4 +173,30 @@ void main() {
     expect(wrows(t), ['내']);
     expect(find.text('설정에서 집·회사를 등록해 주세요'), findsNWidgets(2));
   });
+
+  // 실기기 버그: 아래로 갔다가 쓸어내리면 위 카드가 새로 만들어지며 한 프레임 로딩(작은 높이)으로
+  // 그려지고, 높이가 바뀌어 목록이 제자리로 밀려 올라가지 않았다.
+  testWidgets('아래 끝에서 쓸어내려도 위 카드가 로딩으로 다시 그려지지 않고 맨 위까지 올라간다', (t) async {
+    await pump(t, routes: wx, settings: Settings(home: home, work: work));
+    await t.drag(find.byType(Scrollable).first, const Offset(0, -5000));
+    await t.pumpAndSettle();
+    expect(find.text('커뮤니티'), findsOneWidget);
+    for (var i = 0; i < 60; i++) {
+      await t.drag(find.byType(Scrollable).first, const Offset(0, 100), touchSlopY: 0);
+      await t.pump();
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    }
+    expect(find.text('오늘 일정'), findsOneWidget);
+  });
+
+  testWidgets('맨 아래 카드가 시스템 내비게이션 바에 가리지 않는다', (t) async {
+    t.view.padding = const FakeViewPadding(bottom: 144); // 3버튼 내비 바
+    addTearDown(t.view.reset);
+    await pump(t);
+    await t.drag(find.byType(Scrollable).first, const Offset(0, -5000));
+    await t.pumpAndSettle();
+    final screenH = t.view.physicalSize.height / t.view.devicePixelRatio;
+    final navTop = screenH - 144 / t.view.devicePixelRatio;
+    expect(t.getRect(find.byType(Card).last).bottom, lessThanOrEqualTo(navTop));
+  });
 }

@@ -137,10 +137,13 @@ class _HomePageState extends State<HomePage> {
         ),
       Expanded(child: RefreshIndicator(
       onRefresh: _refresh,
-      child: ListView(
+      // ListView는 화면 밖 카드를 버렸다가 다시 만들어 FutureBuilder가 한 프레임 로딩(다른 높이)으로
+      // 그려지고, 그 높이 변화로 스크롤이 되밀려 쓸어내려도 올라가지 않았다. 카드 8개라 한 번에 다 만든다.
+      child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(bottom: 24),
-        children: [
+        // 3버튼 내비 바 아래로 마지막 카드가 들어가지 않게
+        padding: EdgeInsets.only(bottom: 24 + MediaQuery.paddingOf(context).bottom),
+        child: Column(children: [
           WeatherCard(_weather, needPlaces: _s.home == null && _s.work == null),
           ScheduleCard(_cal, () => _allow(widget.calendar.request)),
           RouteCard(_route, () => _allow(widget.location.request)),
@@ -149,7 +152,7 @@ class _HomePageState extends State<HomePage> {
           TaxCard(_b, _stale, _s.taxSources),
           YoutubeCard(_yt, open: widget.openUrl),
           CommunityCard(_b, _stale, _s.communities),
-        ],
+        ]),
       ),
     )),
     ]),
