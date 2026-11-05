@@ -1,9 +1,10 @@
 # 쏙비서 테스트용 APK
 
-- 최신: [ssokbiseo-demo-1.0.4.apk](https://github.com/LeeJongYoun1/ssokbiseo/raw/apk/ssokbiseo-demo-1.0.4.apk) — 예시 모드(서버 연결 전). 날씨·길찾기·뉴스는 예시 값, 일정·위치는 실제.
+- 최신: [ssokbiseo-demo-1.0.5.apk](https://github.com/LeeJongYoun1/ssokbiseo/raw/apk/ssokbiseo-demo-1.0.5.apk) — 예시 모드(서버 연결 전). 날씨·길찾기·뉴스는 예시 값, 일정·위치는 실제.
 - 안드로이드 전용. 쏙메모와 같은 키로 서명, 쏙메모와 따로 설치됨.
 
 ## 바뀐 점
+- 1.0.5: 채널 추가 화면 — 설명을 입력칸 위로, 복사한 주소 붙여넣기 버튼
 - 1.0.4: GeekNews를 커뮤니티 칸 아래로
 - 1.0.3: 유튜브 채널 추가 — 한글 이름, 영상 링크, 이름만 입력해도 찾기
 - 1.0.2: 유튜브 새 영상(설정에서 채널 등록, 지난 하루 새 영상만)
