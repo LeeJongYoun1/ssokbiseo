@@ -75,16 +75,22 @@ Future<void> pumpHome(WidgetTester t, FakeYt yt,
 void main() {
   setUp(() => TestWidgetsFlutterBinding.ensureInitialized());
 
-  testWidgets('채널 없음 -> 안내', (t) async {
+  Future<void> openRow(WidgetTester t) async {
+    await t.tap(find.text('유튜브 새 영상'));
+    await t.pumpAndSettle();
+  }
+
+  testWidgets('채널 없음 -> 유튜브 줄이 없다', (t) async {
     await pumpHome(t, FakeYt());
-    expect(find.text('유튜브 새 영상'), findsOneWidget);
-    expect(find.text('설정에서 유튜브 채널을 추가해 주세요'), findsOneWidget);
+    expect(find.text('유튜브 새 영상'), findsNothing);
   });
 
   testWidgets('채널별 아코디언(개수), 영상 탭 -> 열기', (t) async {
     final opened = <String>[];
     await pumpHome(t, FakeYt(result: [(ch, [vid('v1', 2), vid('v2', 5)])]),
         channels: [ch], opened: opened);
+    expect(find.text('2개 ›'), findsOneWidget);
+    await openRow(t);
     expect(find.text('맛집채널 (2)'), findsOneWidget);
     expect(find.text('v1'), findsNothing); // 접힌 상태
     await t.tap(find.text('맛집채널 (2)'));
@@ -96,8 +102,10 @@ void main() {
 
   testWidgets('하루 새 영상 없음 / 전부 실패', (t) async {
     await pumpHome(t, FakeYt(result: []), channels: [ch]);
+    await openRow(t);
     expect(find.text('지난 하루 새 영상이 없어요'), findsOneWidget);
     await pumpHome(t, FakeYt(result: null), channels: [ch]);
+    await openRow(t);
     expect(find.text('영상을 불러오지 못했어요'), findsOneWidget);
   });
 

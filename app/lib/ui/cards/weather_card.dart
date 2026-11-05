@@ -22,14 +22,21 @@ List<(String, Place)> weatherTargets({Place? here, Place? home, Place? work}) {
 
 /// 날씨를 한 번에 — 하나라도 실패하면 카드 전체가 실패 문구.
 /// 위치는 이미 얻을 수 있을 때만 쓴다(권한 요청 없음).
-Future<WeatherRows> loadWeather(ServerApi api, Place? home, Place? work,
-    [Future<(double, double)?>? loc]) async {
+Future<WeatherRows> loadWeather(
+  ServerApi api,
+  Place? home,
+  Place? work, [
+  Future<(double, double)?>? loc,
+]) async {
   (double, double)? h;
   try {
     h = await loc;
   } catch (_) {}
   final t = weatherTargets(
-      here: h == null ? null : Place('내 위치', '', h.$1, h.$2), home: home, work: work);
+    here: h == null ? null : Place('내 위치', '', h.$1, h.$2),
+    home: home,
+    work: work,
+  );
   return Future.wait([
     for (final e in t) api.weather(e.$2.lat, e.$2.lon).then((w) => (e.$1, w)),
   ]);
@@ -57,48 +64,137 @@ class _HourStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: 4, bottom: 10),
-        child: Row(children: [
-          for (final h in hourly)
-            Expanded(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Column(children: [
+    padding: const EdgeInsets.only(top: 14),
+    child: Row(
+      children: [
+        for (final h in hourly)
+          Expanded(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                children: [
                   Text('${h.hour}시', style: const TextStyle(fontSize: 15)),
-                  Icon(weatherIcon(h.sky, h.rain, h.hour),
-                      size: 24, color: SsokColors.inkSub),
-                  Text('${h.tempC.round()}°', style: const TextStyle(fontSize: 15)),
-                  Text('${h.pop.round()}%', style: const TextStyle(fontSize: 13)),
-                ]),
+                  Icon(
+                    weatherIcon(h.sky, h.rain, h.hour),
+                    size: 24,
+                    color: SsokColors.ink,
+                  ),
+                  Text(
+                    '${h.tempC.round()}°',
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                  Text(
+                    '${h.pop.round()}%',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: SsokColors.inkSub,
+                    ),
+                  ),
+                ],
               ),
             ),
-        ]),
-      );
+          ),
+      ],
+    ),
+  );
 }
 
-class WeatherCard extends StatelessWidget {
+/// 레몬색 날씨 타일 — 한 곳을 크게, 나머지 곳은 줄로 보여 주고 누르면 바뀐다.
+class WeatherTile extends StatefulWidget {
   final Future<WeatherRows>? future; // null = 날씨 없음
   final bool needPlaces; // 집·회사 미등록 안내
-  const WeatherCard(this.future, {this.needPlaces = false, super.key});
+  const WeatherTile(this.future, {this.needPlaces = false, super.key});
 
   @override
-  Widget build(BuildContext context) => CardShell('날씨', [
-        if (future != null)
-          CardFuture<WeatherRows>(
-              future!,
-              '날씨를 불러오지 못했어요',
-              (l) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    for (final (i, (name, w)) in l.indexed) ...[
-                      if (i > 0)
-                        const Divider(height: 20, color: SsokColors.border),
-                      Align(alignment: Alignment.centerLeft, child: PlaceChip(name)),
-                      const SizedBox(height: 4),
-                      bodyText('${w.tempC.round()}° ${w.sky}'
-                          '${w.rain == '없음' ? '' : ' · ${w.rain}'}'
-                          ' · 강수확률 ${w.popMax.round()}%'),
-                      if (w.hourly.isNotEmpty) _HourStrip(w.hourly),
-                    ],
-                  ])),
-        if (needPlaces) bodyText(kNeedPlaces),
-      ]);
+  State<WeatherTile> createState() => _WeatherTileState();
+}
+
+class _WeatherTileState extends State<WeatherTile> {
+  int _sel = 0;
+
+  @override
+  Widget build(BuildContext context) => Tile(
+    color: SsokColors.lemon,
+    padding: 18,
+    child: DefaultTextStyle.merge(
+      style: const TextStyle(color: SsokColors.ink),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (widget.future != null)
+            CardFuture<WeatherRows>(widget.future!, '날씨를 불러오지 못했어요', _body),
+          if (widget.needPlaces) bodyText(kNeedPlaces),
+        ],
+      ),
+    ),
+  );
+
+  Widget _body(WeatherRows l) {
+    if (l.isEmpty) return const SizedBox.shrink();
+    final i = _sel < l.length ? _sel : 0;
+    final (name, w) = l[i];
+    final range = w.tmin == null || w.tmax == null
+        ? null
+        : '최저 ${w.tmin!.round()}° · 최고 ${w.tmax!.round()}°';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$name · ${w.sky}${w.rain == '없음' ? '' : ' · ${w.rain}'}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '${w.tempC.round()}°',
+                  style: const TextStyle(
+                    fontSize: 64,
+                    fontWeight: FontWeight.w500,
+                    height: 1,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  if (range != null)
+                    Text(range, style: const TextStyle(fontSize: 14)),
+                  Text(
+                    '비 올 확률 ${w.popMax.round()}%',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  for (final (j, (n, o)) in l.indexed)
+                    if (j != i)
+                      InkWell(
+                        onTap: () => setState(() => _sel = j),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Text(
+                            '$n ${o.tempC.round()}° ${o.sky}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        if (w.hourly.isNotEmpty) _HourStrip(w.hourly),
+      ],
+    );
+  }
 }

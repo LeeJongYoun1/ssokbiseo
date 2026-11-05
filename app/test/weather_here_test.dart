@@ -53,16 +53,16 @@ void main() {
 
   testWidgets('시간대 칸 6개, 가로 스크롤 없음', (t) async {
     final w = Weather(12, '맑음', '없음', 10, 5, 15, [
-      for (var i = 0; i < 6; i++) HourWeather(i * 3, 10 + i, '맑음', '없음', 20),
+      for (var i = 0; i < 6; i++) HourWeather(i * 3, 20 + i, '맑음', '없음', 20),
     ]);
     await t.pumpWidget(MaterialApp(
-        home: Scaffold(body: WeatherCard(Future.value([('집', w)])))));
+        home: Scaffold(body: WeatherTile(Future.value([('집', w)])))));
     await t.pump();
     for (var i = 0; i < 6; i++) {
       expect(find.text('${i * 3}시'), findsOneWidget);
-      expect(find.text('${10 + i}°'), findsOneWidget);
+      expect(find.text('${20 + i}°'), findsOneWidget);
     }
-    expect(find.descendant(of: find.byType(WeatherCard), matching: find.byType(Scrollable)),
+    expect(find.descendant(of: find.byType(WeatherTile), matching: find.byType(Scrollable)),
         findsNothing);
   });
 }

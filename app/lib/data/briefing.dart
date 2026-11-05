@@ -17,15 +17,15 @@ const List<Community> kTaxSources = [
 
 const kTopics = ['경제', '재테크', '세무', '부동산', '건강', 'IT', '정치', '사회', '국제', '과학', '스포츠', '연예'];
 
-typedef Mood = ({String key, String emoji, String label});
+typedef Mood = ({String key, String label});
 typedef Tone = ({String key, String label});
 
 const List<Mood> kMoods = [
-  (key: 'good', emoji: '😊', label: '좋음'),
-  (key: 'tired', emoji: '😴', label: '피곤'),
-  (key: 'worried', emoji: '😟', label: '걱정'),
-  (key: 'down', emoji: '😢', label: '우울'),
-  (key: 'eager', emoji: '🔥', label: '의욕'),
+  (key: 'good', label: '좋음'),
+  (key: 'tired', label: '피곤'),
+  (key: 'worried', label: '걱정'),
+  (key: 'down', label: '우울'),
+  (key: 'eager', label: '의욕'),
 ];
 
 const List<Tone> kTones = [

@@ -26,7 +26,7 @@ Future<void> _open(WidgetTester t, Widget Function(ShareText) card, ShareText s,
 void main() {
   testWidgets('뉴스 공유: 제목/요약/원문 url', (t) async {
     String? got, subj;
-    await _open(t, (ShareText s) => NewsCard(Future.value(_b), false, const ['IT'], share: s),
+    await _open(t, (ShareText s) => NewsCard(Future.value(_b), const ['IT'], share: s),
         (x, {subject}) async { got = x; subj = subject; }, '제목');
     expect(got, '제목\n요약\nhttps://a.com/1');
     expect(subj, '제목');
@@ -34,18 +34,16 @@ void main() {
 
   testWidgets('GeekNews 공유: discussUrl 아닌 url', (t) async {
     String? got;
-    await _open(t, (ShareText s) => CommunityCard(Future.value(_b), false, const ['geeknews'], share: s),
+    await _open(t, (ShareText s) => CommunityCard(Future.value(_b), const ['geeknews'], share: s),
         (x, {subject}) async { got = x; }, '긱');
     expect(got, '긱\n긱요약\nhttps://g.com/o');
     expect(find.text('토론 보기'), findsOneWidget);
   });
 
-  testWidgets('커뮤니티: 접힘 -> 펼치면 제목, 어제 표시', (t) async {
+  testWidgets('커뮤니티: 접힘 -> 펼치면 제목', (t) async {
     await t.pumpWidget(MaterialApp(
-        home: Scaffold(body: SingleChildScrollView(child: CommunityCard(Future.value(_b), true, const ['geeknews'])))));
+        home: Scaffold(body: SingleChildScrollView(child: CommunityCard(Future.value(_b), const ['geeknews'])))));
     await t.pumpAndSettle();
-    expect(find.text('커뮤니티'), findsOneWidget);
-    expect(find.text('어제 내용이에요'), findsOneWidget);
     expect(find.text('긱'), findsNothing);
     await t.tap(find.text('GeekNews (1)'));
     await t.pumpAndSettle();
@@ -53,14 +51,14 @@ void main() {
   });
 
   testWidgets('공유 실패 -> 안내', (t) async {
-    await _open(t, (ShareText s) => CommunityCard(Future.value(_b), false, const ['geeknews'], share: s),
+    await _open(t, (ShareText s) => CommunityCard(Future.value(_b), const ['geeknews'], share: s),
         (x, {subject}) async => throw Exception('x'), '긱');
     expect(find.text('공유하지 못했어요'), findsOneWidget);
   });
 
   Future<void> pumpCard(WidgetTester t, List<String> sel, Briefing b) async {
     await t.pumpWidget(MaterialApp(
-        home: Scaffold(body: SingleChildScrollView(child: CommunityCard(Future.value(b), false, sel)))));
+        home: Scaffold(body: SingleChildScrollView(child: CommunityCard(Future.value(b), sel)))));
     await t.pumpAndSettle();
   }
 
@@ -98,16 +96,15 @@ void main() {
     expect(find.text('토론 보기'), findsNothing);
   });
 
-  testWidgets('세무 소식: 선택·순서·라벨, 비면 안내', (t) async {
+  testWidgets('세무 소식: 선택·순서·라벨', (t) async {
     final b = Briefing('d', {}, {}, {}, {
       'sejungilbo': [const CommunityItem('s', null, 'x', 'https://s')],
       'nts_press': [const CommunityItem('p', 12, 'x', 'https://p')],
       'nts_notice': [const CommunityItem('n', 3, 'x', 'https://n')],
     });
     await t.pumpWidget(MaterialApp(
-        home: Scaffold(body: SingleChildScrollView(child: TaxCard(Future.value(b), false, const ['nts_press', 'sejungilbo'])))));
+        home: Scaffold(body: SingleChildScrollView(child: TaxCard(Future.value(b), const ['nts_press', 'sejungilbo'])))));
     await t.pumpAndSettle();
-    expect(find.text('세무 소식'), findsOneWidget);
     expect(find.text('국세청 공지사항 (1)'), findsNothing);
     expect(t.getTopLeft(find.text('세정일보 (1)')).dy < t.getTopLeft(find.text('국세청 보도자료 (1)')).dy, true);
     await t.tap(find.text('국세청 보도자료 (1)'));
@@ -115,14 +112,5 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('조회 12'), findsOneWidget);
     expect(find.textContaining('조회'), findsOneWidget);
-    await t.pumpWidget(MaterialApp(
-        home: Scaffold(body: TaxCard(Future.value(b), false, const []))));
-    await t.pumpAndSettle();
-    expect(find.text('설정에서 볼 세무 소식을 골라 주세요'), findsOneWidget);
-  });
-
-  testWidgets('아무것도 안 골랐으면 안내', (t) async {
-    await pumpCard(t, [], const Briefing('d', {}, {}, {}));
-    expect(find.text('설정에서 볼 커뮤니티를 골라 주세요'), findsOneWidget);
   });
 }

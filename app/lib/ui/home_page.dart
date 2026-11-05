@@ -10,11 +10,10 @@ import '../data/server_api.dart';
 import '../data/settings.dart';
 import '../data/youtube.dart';
 import 'cards/mood_card.dart';
-import 'cards/news_card.dart';
 import 'cards/route_card.dart';
 import 'cards/schedule_card.dart';
+import 'cards/section_list.dart';
 import 'cards/shell.dart';
-import 'cards/youtube_card.dart';
 import 'cards/weather_card.dart';
 import 'settings_page.dart';
 import 'theme.dart';
@@ -52,7 +51,8 @@ class _HomePageState extends State<HomePage> {
   late Future<List<Event>?> _cal;
   late Future<List<Leg>?>? _route;
   late Future<ChannelVideos?>? _yt;
-  late final YoutubeSource _ytSrc = widget.youtube ?? YoutubeSource(http.Client());
+  late final YoutubeSource _ytSrc =
+      widget.youtube ?? YoutubeSource(http.Client());
   bool _stale = false;
 
   @override
@@ -73,11 +73,11 @@ class _HomePageState extends State<HomePage> {
     final loc = _OnceLoc(widget.location); // 날씨·길찾기가 GPS 한 번만 쓰도록
     _weather = loadWeather(widget.api, _s.home, _s.work, loc.current());
     _weather!.ignore(); // 카드가 떼어진 뒤 늦게 실패해도 무시
-    _route = hasPlace
-        ? loadRoutes(widget.api, loc, _s.home, _s.work)
-        : null;
+    _route = hasPlace ? loadRoutes(widget.api, loc, _s.home, _s.work) : null;
     _cal = widget.calendar.today();
-    _yt = _s.channels.isEmpty ? null : _ytSrc.newVideos(_s.channels, DateTime.now());
+    _yt = _s.channels.isEmpty
+        ? null
+        : _ytSrc.newVideos(_s.channels, DateTime.now());
     _yt?.ignore();
   }
 
@@ -106,7 +106,8 @@ class _HomePageState extends State<HomePage> {
     final changed = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (_) => SettingsPage(api: widget.api, store: widget.store, youtube: _ytSrc),
+        builder: (_) =>
+            SettingsPage(api: widget.api, store: widget.store, youtube: _ytSrc),
       ),
     );
     if (changed == true && mounted) setState(_load);
@@ -115,9 +116,20 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text(
-        '쏙비서',
-        style: TextStyle(fontFamily: 'JuaTitle', fontSize: 28),
+      title: Row(
+        crossAxisAlignment: CrossAxisAlignment.baseline,
+        textBaseline: TextBaseline.alphabetic,
+        children: [
+          const Text(
+            '쏙비서',
+            style: TextStyle(fontFamily: 'JuaTitle', fontSize: 28),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            _kstDate(DateTime.now()),
+            style: const TextStyle(fontSize: 14, color: SsokColors.inkSub),
+          ),
+        ],
       ),
       actions: [
         IconButton(
@@ -127,37 +139,75 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     ),
-    body: Column(children: [
-      if (widget.demo)
-        Container(
-          width: double.infinity,
-          color: SsokColors.lemonLight,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: const Text('예시 화면이에요. 날씨·길찾기·뉴스는 연결 전이라 예시로 보여요.'),
+    body: Column(
+      children: [
+        if (widget.demo)
+          Container(
+            width: double.infinity,
+            color: SsokColors.lemonLight,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: const Text('예시 화면이에요. 날씨·길찾기·뉴스는 연결 전이라 예시로 보여요.'),
+          ),
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _refresh,
+            // ListView는 화면 밖 카드를 버렸다가 다시 만들어 FutureBuilder가 한 프레임 로딩(다른 높이)으로
+            // 그려지고, 그 높이 변화로 스크롤이 되밀려 쓸어내려도 올라가지 않았다. 카드 8개라 한 번에 다 만든다.
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              // 3버튼 내비 바 아래로 마지막 카드가 들어가지 않게
+              padding: EdgeInsets.only(
+                bottom: 24 + MediaQuery.paddingOf(context).bottom,
+              ),
+              // stretch: Column은 카드를 내용 폭에 맞춰 가운데 둔다(ListView와 달리)
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    WeatherTile(
+                      _weather,
+                      needPlaces: _s.home == null && _s.work == null,
+                    ),
+                    const SizedBox(height: 10),
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: RouteTile(
+                              _route,
+                              () => _allow(widget.location.request),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ScheduleTile(
+                              _cal,
+                              () => _allow(widget.calendar.request),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    MoodBlock(_b, _stale, _s.moodToday, _s.tone, _pick),
+                    const SizedBox(height: 8),
+                    SectionList(_b, _yt, _s, open: widget.openUrl),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
-      Expanded(child: RefreshIndicator(
-      onRefresh: _refresh,
-      // ListView는 화면 밖 카드를 버렸다가 다시 만들어 FutureBuilder가 한 프레임 로딩(다른 높이)으로
-      // 그려지고, 그 높이 변화로 스크롤이 되밀려 쓸어내려도 올라가지 않았다. 카드 8개라 한 번에 다 만든다.
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        // 3버튼 내비 바 아래로 마지막 카드가 들어가지 않게
-        padding: EdgeInsets.only(bottom: 24 + MediaQuery.paddingOf(context).bottom),
-        // stretch: Column은 카드를 내용 폭에 맞춰 가운데 둔다(ListView와 달리)
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          WeatherCard(_weather, needPlaces: _s.home == null && _s.work == null),
-          ScheduleCard(_cal, () => _allow(widget.calendar.request)),
-          RouteCard(_route, () => _allow(widget.location.request)),
-          MoodCard(_b, _stale, _s.moodToday, _s.tone, _pick),
-          NewsCard(_b, _stale, _s.topics),
-          TaxCard(_b, _stale, _s.taxSources),
-          YoutubeCard(_yt, open: widget.openUrl),
-          CommunityCard(_b, _stale, _s.communities),
-        ]),
-      ),
-    )),
-    ]),
+      ],
+    ),
   );
+}
+
+String _kstDate(DateTime now) {
+  final k = now.toUtc().add(const Duration(hours: 9));
+  return '${k.month}.${k.day} ${'월화수목금토일'[k.weekday - 1]}';
 }
 
 /// current()를 한 번만 부르고 결과를 나눠 쓴다
