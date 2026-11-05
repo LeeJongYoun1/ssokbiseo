@@ -5,9 +5,10 @@
 ## 설정 (처음 한 번만 사용자가 고침)
 
 ```
-SSOK_SERVER=https://<your-vercel-app>.vercel.app
+export SSOK_SERVER=https://<your-vercel-app>.vercel.app
 ```
 
+- 작업을 시작하면 **맨 먼저 위 `export` 줄을 그대로 실행**한다(사용자가 `<your-vercel-app>`을 실제 주소로 한 번만 채운다). 이후 모든 `curl`은 `$SSOK_SERVER`를 쓴다. 값이 비어 있거나 `<`가 들어 있으면 실패로 보고 끝낸다.
 - 비밀 키는 예약 작업 환경의 환경변수 `SSOK_ROUTINE_KEY`로 받는다. 이 파일·출력·커밋 어디에도 키 값을 쓰지 않는다.
 - 모든 날짜·시각은 한국 시간(KST, Asia/Seoul) 기준이다. `TZ=Asia/Seoul date`로 확인한다.
 - "오늘" = 지금 KST 날짜, "어제" = 그 전날. 요일도 KST 기준.
@@ -15,6 +16,8 @@ SSOK_SERVER=https://<your-vercel-app>.vercel.app
 ## 실패 규칙 (가장 중요)
 
 - 1단계 `news-raw` 요청이 실패하거나, 검증이 3번 고쳐도 통과하지 못하면 **`data/briefing.json`을 덮어쓰지 않는다**(어제 파일 그대로 둔다). 커밋·푸시도 하지 않고, 어느 단계에서 왜 실패했는지 오류 요약을 남기고 끝낸다.
+- GeekNews를 못 읽으면 `geeknews`를 `[]`로 두고 계속한다.
+- 원자료에 없는 제목·링크를 만들지 않는다. 모르면 뺀다.
 - 중간에 쓴 임시 파일은 `data/briefing.json`이 아닌 곳(예: `/tmp/briefing.json`)에 둔다. 검증을 통과한 뒤에만 복사한다.
 
 ## 순서
@@ -42,8 +45,10 @@ SSOK_SERVER=https://<your-vercel-app>.vercel.app
    - 통과하면 `data/briefing.json`으로 복사한 뒤:
      ```
      git add data/briefing.json
+     git diff --cached --quiet && echo "nothing to commit"   # 바뀐 게 없으면 커밋·푸시를 건너뛴다
      git commit -m "data: briefing YYYY-MM-DD"
      git push origin main
      ```
+     `git push`가 실패하면 오류를 그대로 보고하고 끝낸다(재시도는 한 번까지만, 무한 반복 금지).
      (YYYY-MM-DD는 오늘 KST 날짜. `main` 푸시는 의도된 배포 방식이다. 앱이 main의 파일을 그대로 읽는다.)
    - 마지막에 한 줄로 결과를 알린다(뉴스 개수, GeekNews 개수, 커밋 해시).
