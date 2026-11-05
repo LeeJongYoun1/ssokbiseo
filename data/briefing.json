@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-06",
+  "date": "2000-01-01",
   "generatedAt": "2026-11-06T05:31:00+09:00",
   "news": {
     "경제": [
@@ -9,75 +9,75 @@
         "url": "https://n.news.naver.com/mnews/article/001/00140100"
       },
       {
-        "title": "원/달러 환율 소폭 하락",
+        "title": "(예시) 원/달러 환율 소폭 하락",
         "summary": "원/달러 환율 소폭 하락 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140101"
       }
     ],
     "부동산": [
       {
-        "title": "(서울) 아파트 거래량 두 달 연속 증가",
+        "title": "(예시) (서울) 아파트 거래량 두 달 연속 증가",
         "summary": "(서울) 아파트 거래량 두 달 연속 증가 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140102"
       }
     ],
     "건강": [
       {
-        "title": "환절기 독감 예방접종 시작",
+        "title": "(예시) 환절기 독감 예방접종 시작",
         "summary": "환절기 독감 예방접종 시작 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140103"
       }
     ],
     "IT": [
       {
-        "title": "국내 AI 반도체 신제품 공개",
+        "title": "(예시) 국내 AI 반도체 신제품 공개",
         "summary": "국내 AI 반도체 신제품 공개 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140104"
       },
       {
-        "title": "스마트폰 보안 업데이트 배포",
+        "title": "(예시) 스마트폰 보안 업데이트 배포",
         "summary": "스마트폰 보안 업데이트 배포 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140105"
       }
     ],
     "정치": [
       {
-        "title": "국회, 내년도 예산안 심사 착수",
+        "title": "(예시) 국회, 내년도 예산안 심사 착수",
         "summary": "국회, 내년도 예산안 심사 착수 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140106"
       }
     ],
     "사회": [
       {
-        "title": "출근길 강추위, 오전까지 이어져",
+        "title": "(예시) 출근길 강추위, 오전까지 이어져",
         "summary": "출근길 강추위, 오전까지 이어져 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140107"
       }
     ],
     "국제": [
       {
-        "title": "주요국 정상회의 개최, 무역 논의",
+        "title": "(예시) 주요국 정상회의 개최, 무역 논의",
         "summary": "주요국 정상회의 개최, 무역 논의 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140108"
       }
     ],
     "과학": [
       {
-        "title": "국내 연구진, 신소재 배터리 개발",
+        "title": "(예시) 국내 연구진, 신소재 배터리 개발",
         "summary": "국내 연구진, 신소재 배터리 개발 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140109"
       }
     ],
     "스포츠": [
       {
-        "title": "프로농구 선두 팀 3연승",
+        "title": "(예시) 프로농구 선두 팀 3연승",
         "summary": "프로농구 선두 팀 3연승 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140110"
       }
     ],
     "연예": [
       {
-        "title": "신작 드라마 첫 방송 시청률 5%",
+        "title": "(예시) 신작 드라마 첫 방송 시청률 5%",
         "summary": "신작 드라마 첫 방송 시청률 5% 소식이에요",
         "url": "https://n.news.naver.com/mnews/article/001/00140111"
       }
