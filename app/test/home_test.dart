@@ -86,8 +86,7 @@ void main() {
   testWidgets('날씨 서버 실패 -> 날씨 카드만 실패, 일정·뉴스는 정상', (t) async {
     await pump(t, settings: Settings(home: home));
     expect(find.text('날씨를 불러오지 못했어요'), findsOneWidget);
-    expect(find.text('하루 종일'), findsOneWidget);
-    expect(find.text('치과 예약'), findsOneWidget);
+    expect(find.text('하루 종일 · 치과 예약'), findsOneWidget);
     expect(find.text('관심 뉴스'), findsOneWidget);
     expect(find.textContaining('경제 · 건강 · IT'), findsOneWidget);
   });
@@ -97,18 +96,33 @@ void main() {
     expect(find.text('권한을 허용하면 볼 수 있어요'), findsOneWidget);
   });
 
-  testWidgets('일정 여러 개 -> 다음 일정과 외 N, 누르면 전체 목록', (t) async {
-    final d = tz.TZDateTime.from(DateTime.now().add(const Duration(hours: 1)), tz.UTC);
+  testWidgets('남은 일정: 지난 일정은 빼고 지금부터 5개까지, 넘치면 더 보기', (t) async {
+    final now = DateTime.now();
+    tz.TZDateTime at(int h) => tz.TZDateTime.from(now.add(Duration(hours: h)), tz.UTC);
     final cal = FakeCal([
-      Event('c', title: '회의', start: d, end: d),
+      Event('c', title: '지난 회의', start: at(-3), end: at(-2)),
+      for (var i = 1; i <= 7; i++) Event('c', title: '일정$i', start: at(i), end: at(i)),
       Event('c', title: '치과', allDay: true),
     ]);
     await pump(t, cal: cal);
-    expect(find.text('회의 외 1'), findsOneWidget);
-    await t.tap(find.text('회의 외 1'));
+    expect(find.text('남은 일정'), findsOneWidget);
+    expect(find.text('지난 회의'), findsNothing);
+    for (var i = 1; i <= 5; i++) {
+      expect(find.text('일정$i'), findsOneWidget);
+    }
+    expect(find.text('일정6'), findsNothing);
+    expect(find.text('하루 종일 · 치과'), findsOneWidget);
+    expect(find.textContaining('다음 일정까지 '), findsOneWidget);
+    await t.tap(find.text('그 외 2개 더 보기'));
     await t.pumpAndSettle();
     expect(find.text('오늘 일정'), findsOneWidget);
     expect(find.text('하루 종일  치과'), findsOneWidget);
+  });
+
+  testWidgets('남은 일정 없음', (t) async {
+    final d = tz.TZDateTime.from(DateTime.now().subtract(const Duration(hours: 2)), tz.UTC);
+    await pump(t, cal: FakeCal([Event('c', title: '아침 회의', start: d, end: d)]));
+    expect(find.text('남은 일정이 없어요'), findsOneWidget);
   });
 
   testWidgets('위치 권한 없음 -> 걸리는 시간 카드 안내', (t) async {
@@ -137,10 +151,9 @@ void main() {
           '/api/route': {'carMin': 25, 'transitMin': null, 'transitBlocked': true},
           '/api/weather': {'tempC': 10, 'sky': '맑음', 'rain': '없음', 'popMax': 0, 'tmin': null, 'tmax': null},
         });
-    expect(find.text('집까지'), findsOneWidget);
+    expect(find.text('집까지 · 차 기준'), findsOneWidget);
     expect(find.text('카카오맵에서 보기'), findsOneWidget);
-    expect(find.text('25분'), findsOneWidget);
-    expect(find.text('차 기준'), findsOneWidget);
+    expect(find.text('25분', findRichText: true), findsOneWidget);
   });
 
   testWidgets('stale -> 어제 내용이에요', (t) async {
@@ -237,7 +250,7 @@ void main() {
       await t.pump();
       expect(find.byType(CircularProgressIndicator), findsNothing);
     }
-    expect(find.text('다음 일정'), findsOneWidget);
+    expect(find.text('남은 일정'), findsOneWidget);
   });
 
   testWidgets('맨 아래 카드가 시스템 내비게이션 바에 가리지 않는다', (t) async {

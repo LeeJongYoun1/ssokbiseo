@@ -170,25 +170,11 @@ class _HomePageState extends State<HomePage> {
                       needPlaces: _s.home == null && _s.work == null,
                     ),
                     const SizedBox(height: 10),
-                    IntrinsicHeight(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: RouteTile(
-                              _route,
-                              () => _allow(widget.location.request),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: ScheduleTile(
-                              _cal,
-                              () => _allow(widget.calendar.request),
-                            ),
-                          ),
-                        ],
-                      ),
+                    RouteTile(_route, () => _allow(widget.location.request)),
+                    const SizedBox(height: 8),
+                    ScheduleTimeline(
+                      _cal,
+                      () => _allow(widget.calendar.request),
                     ),
                     const SizedBox(height: 10),
                     MoodBlock(_b, _stale, _s.moodToday, _s.tone, _pick),

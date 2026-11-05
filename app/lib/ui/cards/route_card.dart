@@ -36,7 +36,7 @@ Future<void> openKakao(Place a, Place b, String by) async {
   if (!await openExternal(kakaoApp(a, b, by))) await openExternal(kakaoWeb(b));
 }
 
-/// 어두운 타일 — 회사(없으면 집)까지 걸리는 시간. 누르면 카카오맵.
+/// 어두운 가로 띠 — 회사(없으면 집)까지 걸리는 시간. 누르면 카카오맵.
 class RouteTile extends StatelessWidget {
   final Future<List<Leg>?>? future; // null = 집·회사 미등록
   final VoidCallback onAllow;
@@ -78,16 +78,32 @@ class RouteTile extends StatelessWidget {
     );
   }
 
+  // 가로 띠: 왼쪽 행선지·수단, 오른쪽 큰 분
   Widget _legs(List<Leg> l, Leg main) {
     final other = l.where((e) => e != main).firstOrNull;
     final (name, _, _, r) = main;
     final transit = r.transitBlocked ? null : r.transitMin;
     final big = transit ?? r.carMin;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final otherMin = other == null
+        ? null
+        : (other.$4.transitBlocked ? null : other.$4.transitMin) ??
+              other.$4.carMin;
+    return Row(
       children: [
-        Text('$name까지', style: _sub),
-        const SizedBox(height: 6),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$name까지 · ${transit == null ? '차 기준' : '버스·지하철'}',
+                style: const TextStyle(fontSize: 14),
+              ),
+              if (transit == null) const Text('카카오맵에서 보기', style: _sub),
+              if (otherMin != null)
+                Text('${other!.$1} $otherMin분', style: _sub),
+            ],
+          ),
+        ),
         if (big != null)
           Text.rich(
             TextSpan(
@@ -95,28 +111,16 @@ class RouteTile extends StatelessWidget {
                 TextSpan(
                   text: '$big',
                   style: const TextStyle(
-                    fontSize: 36,
+                    fontSize: 30,
                     fontWeight: FontWeight.w500,
                     height: 1,
                   ),
                 ),
-                const TextSpan(text: '분', style: TextStyle(fontSize: 16)),
+                const TextSpan(text: '분', style: TextStyle(fontSize: 15)),
+                if (transit != null && r.carMin != null)
+                  TextSpan(text: '  차 ${r.carMin}분', style: _sub),
               ],
             ),
-          ),
-        const SizedBox(height: 6),
-        if (transit == null) ...[
-          if (big != null) const Text('차 기준', style: _sub),
-          const Text('카카오맵에서 보기', style: _sub),
-        ] else
-          Text(
-            '버스·지하철${r.carMin == null ? '' : ' · 차 ${r.carMin}분'}',
-            style: _sub,
-          ),
-        if (other != null && (other.$4.transitMin ?? other.$4.carMin) != null)
-          Text(
-            '${other.$1} ${other.$4.transitMin ?? other.$4.carMin}분',
-            style: _sub,
           ),
       ],
     );
