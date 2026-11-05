@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'config.dart';
 import 'data/briefing_repo.dart';
 import 'data/calendar.dart';
+import 'data/demo.dart';
 import 'data/location.dart';
 import 'data/server_api.dart';
 import 'data/settings.dart';
@@ -26,8 +27,10 @@ Future<void> main() async {
     title: '쏙비서',
     theme: ssokTheme(),
     home: HomePage(
-      briefingRepo: BriefingRepo(client, prefs),
-      api: ServerApi(client),
+      briefingRepo:
+          kDemo ? DemoBriefingRepo(client, prefs) : BriefingRepo(client, prefs),
+      api: kDemo ? DemoServerApi() : ServerApi(client),
+      demo: kDemo,
       store: SettingsStore(prefs),
       calendar: DeviceCalendarSource(),
       location: GeolocatorSource(),

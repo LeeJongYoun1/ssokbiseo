@@ -21,3 +21,5 @@ Vercel 환경변수(이름만; 값은 저장소에 넣지 않는다):
 cd app
 flutter build apk --release --dart-define=SSOK_SERVER=https://<앱주소>.vercel.app --dart-define=SSOK_APP_KEY=<앱 키>
 ```
+
+`--dart-define` 없이 빌드하면 예시 모드(날씨·길찾기·뉴스를 가짜 값으로 보여 줌).

@@ -10,3 +10,6 @@ void warnIfConfigMissing() {
     debugPrint('SSOK_SERVER / SSOK_APP_KEY 없이 빌드됨 — --dart-define 필요');
   }
 }
+
+/// 서버 주소 없이 빌드하면 예시 모드(키 필요한 부분을 가짜 값으로 채움).
+const bool kDemo = serverBase == '';

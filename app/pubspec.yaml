@@ -66,6 +66,7 @@ flutter:
 
   assets:
     - assets/fonts/OFL.txt
+    - assets/demo/briefing.json
   fonts:
     - family: JuaTitle
       fonts:

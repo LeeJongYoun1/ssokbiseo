@@ -13,6 +13,7 @@ import 'cards/route_card.dart';
 import 'cards/schedule_card.dart';
 import 'cards/weather_card.dart';
 import 'settings_page.dart';
+import 'theme.dart';
 
 class HomePage extends StatefulWidget {
   final BriefingRepo briefingRepo;
@@ -20,6 +21,7 @@ class HomePage extends StatefulWidget {
   final SettingsStore store;
   final CalendarSource calendar;
   final LocationSource location;
+  final bool demo;
   const HomePage({
     super.key,
     required this.briefingRepo,
@@ -27,6 +29,7 @@ class HomePage extends StatefulWidget {
     required this.store,
     required this.calendar,
     required this.location,
+    this.demo = false,
   });
 
   @override
@@ -110,7 +113,15 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     ),
-    body: RefreshIndicator(
+    body: Column(children: [
+      if (widget.demo)
+        Container(
+          width: double.infinity,
+          color: SsokColors.lemonLight,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: const Text('예시 화면이에요. 날씨·길찾기·뉴스는 연결 전이라 예시로 보여요.'),
+        ),
+      Expanded(child: RefreshIndicator(
       onRefresh: _refresh,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -124,6 +135,7 @@ class _HomePageState extends State<HomePage> {
           GeekNewsCard(_b, _stale),
         ],
       ),
-    ),
+    )),
+    ]),
   );
 }
