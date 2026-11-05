@@ -54,7 +54,7 @@ class _ChannelAddPageState extends State<ChannelAddPage> {
                 child: TextField(
                   controller: _c,
                   style: const TextStyle(fontSize: 18),
-                  decoration: const InputDecoration(hintText: '채널 주소나 @이름을 붙여 넣어 주세요'),
+                  decoration: const InputDecoration(hintText: '채널 주소, 영상 주소, @이름 중 하나를 붙여 넣어 주세요'),
                   onSubmitted: (_) => _add(),
                 ),
               ),

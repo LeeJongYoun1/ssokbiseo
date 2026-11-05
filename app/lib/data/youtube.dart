@@ -20,21 +20,42 @@ class YtVideo {
 
 typedef ChannelVideos = List<(YtChannel, List<YtVideo>)>;
 
-/// 채널 id(UC…) 또는 핸들(@이름) 또는 null
-String? parseChannelInput(String raw) {
+enum ChannelRef { id, handle, video }
+
+/// 입력(주소·영상 주소·@이름·이름, 앞뒤 글이 붙어도 됨)을 (종류, 값)으로. 핸들은 @ 없이 디코딩된 값.
+(ChannelRef, String)? parseChannelInput(String raw) {
   final s = raw.trim();
-  final id = RegExp(r'/channel/(UC[\w-]{22})').firstMatch(s)?.group(1);
-  if (id != null) return id;
-  if (RegExp(r'^UC[\w-]{22}$').hasMatch(s)) return s;
-  final isUrl = RegExp(r'^(https?://)?(www\.|m\.)?youtube\.com/').hasMatch(s);
-  return isUrl
-      ? RegExp(r'youtube\.com/(@[\w.\-]+)').firstMatch(s)?.group(1)
-      : RegExp(r'^(@[\w.\-]+)$').firstMatch(s)?.group(1);
+  final url = RegExp(r'(?<![\w.\-/@])((?:https?://)?(?:(?:www|m|music)\.)?(?:youtube\.com|youtu\.be)/\S*)')
+      .firstMatch(s)
+      ?.group(1);
+  if (url == null) {
+    if (RegExp(r'^UC[\w-]{22}$').hasMatch(s)) return (ChannelRef.id, s);
+    final h = RegExp(r'^@?([^\s/?#@]+)$').firstMatch(s)?.group(1);
+    return h == null ? null : (ChannelRef.handle, _decode(h));
+  }
+  String? m(String p) => RegExp(p).firstMatch(url)?.group(1);
+  final id = m(r'/channel/(UC[\w-]{22})');
+  if (id != null) return (ChannelRef.id, id);
+  final h = m(r'/@([^/?#\s]+)');
+  if (h != null) return (ChannelRef.handle, _decode(h));
+  final v = m(r'youtu\.be/([\w-]{11})') ??
+      m(r'[?&]v=([\w-]{11})') ??
+      m(r'/(?:shorts|live|embed)/([\w-]{11})');
+  return v == null ? null : (ChannelRef.video, v);
+}
+
+String _decode(String h) {
+  try {
+    return Uri.decodeComponent(h);
+  } catch (_) {
+    return h;
+  }
 }
 
 String? channelIdFromHtml(String html) =>
     RegExp(r'videos\.xml\?channel_id=(UC[\w-]{22})').firstMatch(html)?.group(1) ??
-    RegExp(r'"externalId":"(UC[\w-]{22})"').firstMatch(html)?.group(1);
+    RegExp(r'"externalId":"(UC[\w-]{22})"').firstMatch(html)?.group(1) ??
+    RegExp(r'"channelId":"(UC[\w-]{22})"').firstMatch(html)?.group(1); // 영상 페이지
 
 String? feedTitle(String xml) {
   try {
@@ -67,24 +88,29 @@ class YoutubeSource {
   final http.Client _c;
   YoutubeSource(this._c);
 
-  Future<String> _get(String url) async {
+  // 채널·영상 페이지는 ~1MB라 모바일 데이터에서 5초로는 모자라다.
+  Future<String> _get(String url, {int secs = 15}) async {
     final r = await _c
-        .get(Uri.parse(url), headers: {'User-Agent': _ua}).timeout(const Duration(seconds: 5));
+        .get(Uri.parse(url), headers: {'User-Agent': _ua}).timeout(Duration(seconds: secs));
     if (r.statusCode != 200) throw http.ClientException('${r.statusCode}');
     return utf8.decode(r.bodyBytes, allowMalformed: true);
   }
 
-  Future<String> _feed(String id) => _get('https://www.youtube.com/feeds/videos.xml?channel_id=$id');
+  Future<String> _feed(String id, {int secs = 15}) =>
+      _get('https://www.youtube.com/feeds/videos.xml?channel_id=$id', secs: secs);
 
   /// 못 찾으면 null
   Future<YtChannel?> resolve(String input) async {
     try {
-      var id = parseChannelInput(input);
+      final ref = parseChannelInput(input);
+      if (ref == null) return null;
+      final String? id = switch (ref.$1) {
+        ChannelRef.id => ref.$2,
+        ChannelRef.handle =>
+          channelIdFromHtml(await _get('https://www.youtube.com/@${Uri.encodeComponent(ref.$2)}')),
+        ChannelRef.video => channelIdFromHtml(await _get('https://www.youtube.com/watch?v=${ref.$2}')),
+      };
       if (id == null) return null;
-      if (id.startsWith('@')) {
-        id = channelIdFromHtml(await _get('https://www.youtube.com/$id'));
-        if (id == null) return null;
-      }
       final name = feedTitle(await _feed(id));
       return name == null || name.isEmpty ? null : YtChannel(id, name);
     } catch (_) {
@@ -96,7 +122,7 @@ class YoutubeSource {
   Future<ChannelVideos?> newVideos(List<YtChannel> channels, DateTime now) async {
     final rs = await Future.wait(channels.map((ch) async {
       try {
-        return (ch, recentVideos(parseFeed(await _feed(ch.id)), now));
+        return (ch, recentVideos(parseFeed(await _feed(ch.id, secs: 5)), now));
       } catch (_) {
         return null;
       }
