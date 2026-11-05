@@ -6,6 +6,7 @@ import 'package:biseo/data/location.dart';
 import 'package:biseo/data/server_api.dart';
 import 'package:biseo/data/settings.dart';
 import 'package:biseo/data/youtube.dart';
+import 'package:biseo/ui/channel_add_page.dart';
 import 'package:biseo/ui/home_page.dart';
 import 'package:biseo/ui/settings_page.dart';
 import 'package:flutter/material.dart';
@@ -149,5 +150,52 @@ void main() {
     SharedPreferences.setMockInitialValues({'settings_json': jsonEncode({'tone': 'friend'})});
     final s = SettingsStore(await SharedPreferences.getInstance()).load();
     expect(s.channels, isEmpty);
+  });
+
+  group('채널 추가 화면', () {
+    YtChannel? popped;
+    Future<void> openAdd(WidgetTester t, String? clip) async {
+      popped = null;
+      await t.pumpWidget(MaterialApp(
+        home: Builder(
+          builder: (c) => TextButton(
+            onPressed: () async => popped = await Navigator.push<YtChannel>(
+                c,
+                MaterialPageRoute(
+                    builder: (_) => ChannelAddPage(
+                        youtube: FakeYt(resolved: ch),
+                        existing: const [],
+                        readClipboard: () async => clip))),
+            child: const Text('열기'),
+          ),
+        ),
+      ));
+      await t.tap(find.text('열기'));
+      await t.pumpAndSettle();
+    }
+
+    testWidgets('힌트와 안내 문구', (t) async {
+      await openAdd(t, null);
+      expect(find.text('예) @곽튜브'), findsOneWidget);
+      expect(find.text('아래 중 하나를 붙여 넣어 주세요.'), findsOneWidget);
+      for (final l in ['• 채널 주소', '• 영상 주소', '• @채널이름']) {
+        expect(find.text(l), findsOneWidget);
+      }
+    });
+
+    testWidgets('붙여넣기 버튼 -> 바로 추가', (t) async {
+      await openAdd(t, '@YouTube');
+      await t.tap(find.text('복사한 주소 붙여넣기'));
+      await t.pumpAndSettle();
+      expect(popped, ch);
+    });
+
+    testWidgets('클립보드 비면 안내', (t) async {
+      await openAdd(t, '');
+      await t.tap(find.text('복사한 주소 붙여넣기'));
+      await t.pumpAndSettle();
+      expect(find.text('복사한 주소가 없어요'), findsOneWidget);
+      expect(popped, isNull);
+    });
   });
 }
