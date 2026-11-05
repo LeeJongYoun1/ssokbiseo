@@ -47,11 +47,9 @@ class SectionList extends StatelessWidget {
             _Row<Briefing?>(
               '세무 소식',
               briefing,
-              (b) => tax
-                  .map(
-                    (c) => '${c.label}${_n(b?.tax[c.key]?.length, sep: ' ')}',
-                  )
-                  .join(' · '),
+              // 다른 줄처럼 이름 · 이름  합계 — 한 줄에 들어가게 '국세청 '은 뺀다
+              (b) =>
+                  '${tax.map((c) => c.label.replaceFirst('국세청 ', '')).join(' · ')}${_n(b == null ? null : tax.fold<int>(0, (a, c) => a + (b.tax[c.key]?.length ?? 0)), sep: '  ')}',
               TaxCard(briefing, s.taxSources),
             ),
           if (videos != null)
