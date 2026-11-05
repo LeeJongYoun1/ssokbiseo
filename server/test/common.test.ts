@@ -1,7 +1,7 @@
 import { test, expect } from 'vitest';
-import { kstDate } from '../lib/kst';
-import { incrDaily, memoryStore } from '../lib/counter';
-import { checkAppKey, checkRoutineKey } from '../lib/auth';
+import { kstDate } from '../lib/kst.js';
+import { incrDaily, memoryStore } from '../lib/counter.js';
+import { checkAppKey, checkRoutineKey } from '../lib/auth.js';
 
 const NOW = new Date('2026-11-05T03:00:00Z');
 

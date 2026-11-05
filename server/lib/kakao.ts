@@ -9,7 +9,11 @@
 export type LL = { lat: number; lon: number };
 
 const auth = () => ({ Authorization: `KakaoAK ${process.env.KAKAO_REST_KEY ?? ''}` });
-const get = async (url: string) => (await fetch(url, { headers: auth() })).json();
+const get = async (url: string) => {
+  const r = await fetch(url, { headers: auth() });
+  if (!r.ok) throw new Error(`kakao ${r.status}`); // 키·쿼터 오류가 "결과 없음"으로 보이지 않게
+  return r.json();
+};
 const min = (sec: number) => Math.round(sec / 60);
 
 export async function kakaoCarMinutes(from: LL, to: LL): Promise<number | null> {

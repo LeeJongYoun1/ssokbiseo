@@ -1,7 +1,8 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { memoryStore } from '../lib/counter';
-import { makeRouteHandler } from '../api/route';
-import { GET as geocode } from '../api/geocode';
+import { memoryStore } from '../lib/counter.js';
+import { makeRouteHandler } from '../api/route.js';
+import { makeGeocodeHandler } from '../api/geocode.js';
+const geocode = makeGeocodeHandler({ store: memoryStore() });
 
 process.env.SSOK_APP_KEY = 'k';
 const H = { 'x-ssok-key': 'k' };
@@ -63,4 +64,46 @@ test('좌표 범위 밖(lat 33~39, lon 124~132 아님)이면 400', async () => {
   stub(carOk, trOk);
   const r = await makeRouteHandler({ store: memoryStore() })(rq('route?fromLat=10&fromLon=127&toLat=37.4&toLon=127.1'));
   expect(r.status).toBe(400);
+});
+
+// --- 일일 상한 / 업스트림 오류 ---
+import { makeWeatherHandler } from '../api/weather.js';
+const today = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
+async function filled(name: string, n: number) {
+  const s = memoryStore();
+  for (let i = 0; i < n; i++) await s.incr(`${name}:${today()}`);
+  return s;
+}
+const brokenStore = { incr: async () => { throw new Error('no redis'); }, expire: async () => 0 };
+
+test('geocode: 카카오 401이면 502', async () => {
+  vi.stubGlobal('fetch', vi.fn(async () => new Response('{}', { status: 401 })));
+  expect((await geocode(rq('geocode?q=카페'))).status).toBe(502);
+});
+
+test('geocode: 2000건 넘으면 429 limit, 카운터 장애면 통과', async () => {
+  const f = vi.fn(async () => ok({ documents: [] }));
+  vi.stubGlobal('fetch', f);
+  const r = await makeGeocodeHandler({ store: await filled('geocode', 2000) })(rq('geocode?q=a'));
+  expect([r.status, await r.json()]).toEqual([429, { error: 'limit' }]);
+  expect(f).not.toHaveBeenCalled();
+  expect((await makeGeocodeHandler({ store: brokenStore })(rq('geocode?q=a'))).status).toBe(200);
+});
+
+test('weather: 4000건 넘으면 429 limit, 카운터 장애면 통과', async () => {
+  const f = vi.fn(async () => ok({}));
+  vi.stubGlobal('fetch', f);
+  const W = 'weather?lat=37.5&lon=127';
+  const r = await makeWeatherHandler({ store: await filled('weather', 4000) })(rq(W));
+  expect([r.status, await r.json()]).toEqual([429, { error: 'limit' }]);
+  expect(f).not.toHaveBeenCalled();
+  expect((await makeWeatherHandler({ store: brokenStore })(rq(W))).status).not.toBe(429);
+});
+
+test('route: 자동차 5000건 넘으면 carMin=null이고 대중교통은 계속', async () => {
+  const f = stub(carOk, trOk);
+  const store = await filled('car', 5000);
+  const j = await makeRouteHandler({ store })(rq(ROUTE)).then((r) => r.json());
+  expect(j).toEqual({ carMin: null, transitMin: 30, transitBlocked: false });
+  expect(f.mock.calls.some((c) => String(c[0]).includes('kakaomobility'))).toBe(false);
 });

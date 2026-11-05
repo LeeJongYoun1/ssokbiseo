@@ -1,6 +1,6 @@
-import { checkAppKey } from '../lib/auth';
-import { defaultStore, incrDaily, type Store } from '../lib/counter';
-import { kakaoCarMinutes, kakaoTransitMinutes } from '../lib/kakao';
+import { checkAppKey } from '../lib/auth.js';
+import { defaultStore, incrDaily, underCap, type Store } from '../lib/counter.js';
+import { kakaoCarMinutes, kakaoTransitMinutes } from '../lib/kakao.js';
 
 const json = (b: unknown, status = 200) => Response.json(b, { status });
 const inKr = (lat: number, lon: number) => lat >= 33 && lat <= 39 && lon >= 124 && lon <= 132;
@@ -15,10 +15,10 @@ export function makeRouteHandler(o: { store?: Store; now?: () => Date } = {}) {
 
     // 카운터(Redis) 실패도 "차단"으로 취급 — 유료 호출 방지
     let blocked = true;
-    try { blocked = !(await incrDaily('transit', 900, o.now?.() ?? new Date(), o.store ?? defaultStore())).allowed; } catch { /* blocked */ }
+    try { blocked = !(await incrDaily('transit', 900, o.now?.() ?? new Date(), o.store ?? defaultStore())).allowed; } catch (e) { console.error('counter transit failed', e); }
 
     const [carMin, transitMin] = await Promise.all([
-      kakaoCarMinutes(from, dest),
+      (await underCap('car', 5000, o.now?.(), o.store)) ? kakaoCarMinutes(from, dest) : null,
       blocked ? null : kakaoTransitMinutes(from, dest),
     ]);
     return json({ carMin, transitMin, transitBlocked: blocked });

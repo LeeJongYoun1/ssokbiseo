@@ -1,6 +1,8 @@
 import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
-import { toGrid } from '../lib/grid';
-import { GET } from '../api/weather';
+import { toGrid } from '../lib/grid.js';
+import { makeWeatherHandler } from '../api/weather.js';
+import { memoryStore } from '../lib/counter.js';
+const GET = makeWeatherHandler({ store: memoryStore() });
 
 const ok = (item: unknown[]) => ({ response: { header: { resultCode: '00' }, body: { items: { item } } } });
 const ncst = ok([

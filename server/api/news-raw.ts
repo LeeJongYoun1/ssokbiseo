@@ -1,7 +1,7 @@
-import { checkRoutineKey } from '../lib/auth';
-import { cleanText } from '../lib/clean';
-import { kstDate } from '../lib/kst';
-import { TOPICS } from '../lib/topics';
+import { checkRoutineKey } from '../lib/auth.js';
+import { cleanText } from '../lib/clean.js';
+import { kstDate } from '../lib/kst.js';
+import { TOPICS } from '../lib/topics.js';
 
 type Item = { title: string; description: string; link: string; pubDate: string };
 const json = (b: unknown, status = 200) => Response.json(b, { status });

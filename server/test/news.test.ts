@@ -1,7 +1,7 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { cleanText } from '../lib/clean';
-import { TOPICS } from '../lib/topics';
-import { GET } from '../api/news-raw';
+import { cleanText } from '../lib/clean.js';
+import { TOPICS } from '../lib/topics.js';
+import { GET } from '../api/news-raw.js';
 
 process.env.SSOK_ROUTINE_KEY = 'r';
 const rq = (key = 'r') => new Request('http://x/api/news-raw', { headers: { 'x-ssok-routine-key': key } });

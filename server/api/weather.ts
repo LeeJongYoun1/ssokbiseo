@@ -1,6 +1,7 @@
-import { checkAppKey } from '../lib/auth';
-import { toGrid } from '../lib/grid';
-import { kstDate, kstHM } from '../lib/kst';
+import { checkAppKey } from '../lib/auth.js';
+import { underCap, type Store } from '../lib/counter.js';
+import { toGrid } from '../lib/grid.js';
+import { kstDate, kstHM } from '../lib/kst.js';
 
 const BASE = 'https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/';
 const SKY: Record<string, string> = { '1': '맑음', '3': '구름많음', '4': '흐림' };
@@ -19,12 +20,14 @@ async function kma(op: string, date: string, time: string, nx: number, ny: numbe
   return (j.response.body?.items?.item ?? []) as Record<string, string>[];
 }
 
-export async function GET(req: Request): Promise<Response> {
+export function makeWeatherHandler(o: { store?: Store; now?: () => Date } = {}) {
+  return async (req: Request): Promise<Response> => {
   if (!checkAppKey(req)) return json({ error: 'unauthorized' }, 401);
   const p = new URL(req.url).searchParams;
   const lat = Number(p.get('lat')), lon = Number(p.get('lon'));
   if (!p.get('lat') || !p.get('lon') || !Number.isFinite(lat) || !Number.isFinite(lon)
     || Math.abs(lat) > 90 || Math.abs(lon) > 180) return json({ error: 'bad lat/lon' }, 400);
+  if (!(await underCap('weather', 4000, o.now?.(), o.store))) return json({ error: 'limit' }, 429);
   const { nx, ny } = toGrid(lat, lon);
   const now = new Date();
 
@@ -65,3 +68,6 @@ export async function GET(req: Request): Promise<Response> {
     return json({ error: 'kma upstream error' }, 502);
   }
 }
+}
+
+export const GET = makeWeatherHandler();

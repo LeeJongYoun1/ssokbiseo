@@ -1,5 +1,5 @@
 import { Redis } from '@upstash/redis';
-import { kstDate } from './kst';
+import { kstDate } from './kst.js';
 
 export interface Store {
   incr(key: string): Promise<number>;
@@ -27,4 +27,10 @@ export async function incrDaily(
   const count = await store.incr(key);
   if (count === 1) await store.expire(key, 2 * 86400);
   return { count, allowed: count <= limit };
+}
+
+// 비용이 없는 호출용 상한: 카운터(Redis) 장애면 열어 둔다(fail open). 유료 호출(대중교통)만 fail closed.
+export async function underCap(name: string, limit: number, now?: Date, store?: Store): Promise<boolean> {
+  try { return (await incrDaily(name, limit, now, store)).allowed; }
+  catch (e) { console.error(`counter ${name} failed`, e); return true; }
 }
