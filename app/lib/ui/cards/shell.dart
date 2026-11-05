@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../theme.dart';
@@ -14,6 +15,11 @@ Future<bool> openExternal(String url) async {
     return false;
   }
 }
+
+typedef ShareText = Future<void> Function(String text, {String? subject});
+
+Future<void> shareText(String text, {String? subject}) =>
+    SharePlus.instance.share(ShareParams(text: text, subject: subject)).then((_) {});
 
 class CardShell extends StatelessWidget {
   final String title;
@@ -68,12 +74,12 @@ class CardFuture<T> extends StatelessWidget {
 }
 
 void showDetail(BuildContext context, String title, String summary,
-    List<(String, String)> links) {
+    List<(String, String)> links, {ShareText share = shareText}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: SsokColors.cream,
-    builder: (_) => SafeArea(
+    builder: (sheet) => SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(child: Column(
@@ -84,10 +90,25 @@ void showDetail(BuildContext context, String title, String summary,
               const SizedBox(height: 10),
               Text(summary, style: const TextStyle(fontSize: 17, height: 1.5)),
               const SizedBox(height: 16),
-              Wrap(spacing: 8, children: [
+              Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final l in links)
                   if (l.$2.isNotEmpty)
                     FilledButton(onPressed: () => openExternal(l.$2), child: Text(l.$1)),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.share),
+                  label: const Text('공유하기'),
+                  onPressed: () async {
+                    final url = links.isEmpty ? '' : links.first.$2;
+                    try {
+                      await share('$title\n$summary\n$url', subject: title);
+                    } catch (_) {
+                      if (sheet.mounted) {
+                        ScaffoldMessenger.of(sheet).showSnackBar(
+                            const SnackBar(content: Text('공유하지 못했어요')));
+                      }
+                    }
+                  },
+                ),
               ]),
             ])),
       ),

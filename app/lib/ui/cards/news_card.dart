@@ -7,7 +7,9 @@ class NewsCard extends StatelessWidget {
   final Future<Briefing?> briefing;
   final bool stale;
   final List<String> topics;
-  const NewsCard(this.briefing, this.stale, this.topics, {super.key});
+  final ShareText share;
+  const NewsCard(this.briefing, this.stale, this.topics,
+      {this.share = shareText, super.key});
 
   @override
   Widget build(BuildContext context) => CardShell('관심 뉴스', [
@@ -28,7 +30,8 @@ class NewsCard extends StatelessWidget {
                       contentPadding: EdgeInsets.zero,
                       title: Text(n.title, style: const TextStyle(fontSize: 17)),
                       onTap: () =>
-                          showDetail(context, n.title, n.summary, [('원문 보기', n.url)]),
+                          showDetail(context, n.title, n.summary, [('원문 보기', n.url)],
+                              share: share),
                     ),
                 ],
               ),
@@ -40,7 +43,8 @@ class NewsCard extends StatelessWidget {
 class GeekNewsCard extends StatelessWidget {
   final Future<Briefing?> briefing;
   final bool stale;
-  const GeekNewsCard(this.briefing, this.stale, {super.key});
+  final ShareText share;
+  const GeekNewsCard(this.briefing, this.stale, {this.share = shareText, super.key});
 
   @override
   Widget build(BuildContext context) => CardShell('GeekNews', [
@@ -54,7 +58,8 @@ class GeekNewsCard extends StatelessWidget {
                 title: Text(g.title, style: const TextStyle(fontSize: 17)),
                 subtitle: Text('${g.points}점'),
                 onTap: () => showDetail(context, g.title, g.summary,
-                    [('원문 보기', g.url), ('토론 보기', g.discussUrl)]),
+                    [('원문 보기', g.url), ('토론 보기', g.discussUrl)],
+                    share: share),
               ),
           ]);
         }),
