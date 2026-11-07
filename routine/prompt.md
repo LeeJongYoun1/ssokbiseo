@@ -5,10 +5,10 @@
 ## 설정 (처음 한 번만 사용자가 고침)
 
 ```
-export SSOK_SERVER=https://<your-vercel-app>.vercel.app
+export SSOK_SERVER=https://ssokbiseo-server.vercel.app
 ```
 
-- 작업을 시작하면 **맨 먼저 위 `export` 줄을 그대로 실행**한다(사용자가 `<your-vercel-app>`을 실제 주소로 한 번만 채운다). 이후 모든 `curl`은 `$SSOK_SERVER`를 쓴다. 값이 비어 있거나 `<`가 들어 있으면 실패로 보고 끝낸다.
+- 작업을 시작하면 **맨 먼저 위 `export` 줄을 그대로 실행**한다(서버 주소는 이미 채워져 있다). 이후 모든 `curl`은 `$SSOK_SERVER`를 쓴다. 값이 비어 있거나 `<`가 들어 있으면 실패로 보고 끝낸다.
 - 비밀 키는 예약 작업 환경의 환경변수 `SSOK_ROUTINE_KEY`로 받는다. 이 파일·출력·커밋 어디에도 키 값을 쓰지 않는다.
 - 모든 날짜·시각은 한국 시간(KST, Asia/Seoul) 기준이다. `TZ=Asia/Seoul date`로 확인한다.
 - "오늘" = 지금 KST 날짜, "어제" = 그 전날. 요일도 KST 기준.
