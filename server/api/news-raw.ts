@@ -27,7 +27,11 @@ export async function GET(req: Request): Promise<Response> {
   if (!checkRoutineKey(req)) return json({ error: 'unauthorized' }, 401);
   const results = await Promise.allSettled(TOPICS.map(search));
   // 전부 실패 = 키/쿼터 문제 → 루틴이 눈치채도록 502
-  if (results.every((r) => r.status === 'rejected')) return json({ error: 'naver upstream error' }, 502);
+  if (results.every((r) => r.status === 'rejected')) {
+    // 상태 코드만 노출(키 값은 없음): 401=ID/Secret 오류, 403=검색 API 미설정, 429=쿼터
+    const why = [...new Set(results.map((r) => (r as PromiseRejectedResult).reason?.message ?? 'unknown'))];
+    return json({ error: 'naver upstream error', why }, 502);
+  }
   const topics = Object.fromEntries(TOPICS.map((t, i) => {
     const r = results[i];
     return [t, r.status === 'fulfilled' ? r.value : []];
