@@ -39,7 +39,7 @@
 
 | 경로 | 입력 | 출력(JSON) |
 |---|---|---|
-| `GET /api/weather` | `lat`, `lon` | `{ tempC: number, sky: "맑음"\|"구름많음"\|"흐림", rain: "없음"\|"비"\|"비/눈"\|"눈"\|"소나기", popMax: number, tmin: number\|null, tmax: number\|null }` |
+| `GET /api/weather` | `lat`, `lon` | `{ tempC: number, sky: "맑음"\|"구름많음"\|"흐림", rain: "없음"\|"비"\|"비/눈"\|"눈"\|"소나기", popMax: number, tmin: number\|null, tmax: number\|null, hourly: { hour: 0-23, tempC, sky, rain, pop }[] (3시간 간격 최대 6칸) }` |
 | `GET /api/geocode` | `q` | `{ items: [{ name: string, address: string, lat: number, lon: number }] }` (최대 5개) |
 | `GET /api/route` | `fromLat`,`fromLon`,`toLat`,`toLon` | `{ carMin: number\|null, transitMin: number\|null, transitBlocked: boolean }` |
 | `GET /api/news-raw` | (없음, 헤더 `x-ssok-key` 대신 `x-ssok-routine-key`) | `{ date: "YYYY-MM-DD", topics: { [topic]: [{ title, description, link, pubDate }] } }` |
@@ -51,13 +51,16 @@
   "generatedAt": "2026-11-06T05:31:00+09:00",
   "news": { "경제": [{ "title": "...", "summary": "...", "url": "https://..." }] },
   "advice": { "good": { "friend": "...", "coach": "...", "quote": "...", "action": "..." } },
-  "geeknews": [{ "title": "...", "points": 42, "summary": "...", "url": "https://...", "discussUrl": "https://news.hada.io/topic?id=..." }]
+  "community": { "geeknews": [Item], "ppomppu": [Item], "ruliweb": [Item], "82cook": [Item] }
+  "tax": { "sejungilbo": [Item], "nts_press": [Item], "nts_notice": [Item] }  // 세무 소식, 없으면 빈 목록, discussUrl은 항상 null
+  // Item = { "title": "...", "points": 42 또는 null, "summary": "...", "url": "https://...", "discussUrl": "https://..." 또는 null(GeekNews만 값) }
+  // 앱은 옛 최상위 "geeknews"도 community.geeknews로 받아들인다
 }
 ```
-- 주제(`TOPICS`, 순서 고정): `경제, 부동산, 건강, IT, 정치, 사회, 국제, 과학, 스포츠, 연예`
+- 주제(`TOPICS`, 순서 고정): `경제, 재테크, 세무, 부동산, 건강, IT, 정치, 사회, 국제, 과학, 스포츠, 연예`
 - 기분 키: `good`😊좋음, `tired`😴피곤, `worried`😟걱정, `down`😢우울, `eager`🔥의욕
 - 말투 키: `friend` 다정한 친구, `coach` 짧고 힘 있는 코치, `quote` 명언 인용, `action` 오늘 해 볼 작은 행동
-- 각 주제·geeknews는 0~10개, advice는 5×4 전부 채움.
+- 각 주제·커뮤니티는 0~10개, advice는 5×4 전부 채움.
 
 ---
 
@@ -137,7 +140,7 @@ test('좌표 범위 밖(lat 33~39, lon 124~132 아님)이면 400', ...);
 - [ ] **Step 1: 실패하는 테스트**
 ```ts
 expect(cleanText('<b>삼성</b> &quot;반도체&quot; 회복&amp;')).toBe('삼성 "반도체" 회복&');
-test('주제 10개 모두 키로 있고, 각 display=10&sort=date로 호출', ...);
+test('주제 12개 모두 키로 있고, 각 display=10&sort=date로 호출', ...);
 test('한 주제가 실패하면 그 주제만 빈 배열', ...);
 test('routine 키가 틀리면 401', ...);
 ```
@@ -229,7 +232,7 @@ assert.ok(validateBriefing({...sample, date: '2026/11/06'}).length > 0);
 - Consumes: `ServerApi.geocode`, `SettingsStore`
 - Produces: `SettingsPage({required ServerApi, required SettingsStore})`, 저장 후 `Navigator.pop(context, true)` → 홈이 새로고침.
 
-항목: 집 / 회사(누르면 주소 검색 → 후보 목록 → 고르기), 볼 뉴스 주제(체크 10개, 최소 1개), 조언 말투(라디오 4개).
+항목: 집 / 회사(누르면 주소 검색 → 후보 목록 → 고르기), 볼 뉴스 주제(체크 12개, 최소 1개), 조언 말투(라디오 4개).
 - [ ] **Step 1: 실패하는 위젯 테스트**: 주소 '판교역' 검색 → 후보 탭 → 저장값 `work.name`; 주제를 모두 끄려 하면 마지막 하나는 꺼지지 않음; 말투 '명언 인용' 선택 → `tone=='quote'`; 검색 0건이면 '찾는 곳이 없어요. 동 이름이나 건물 이름으로 찾아보세요'
 - [ ] **Step 2:** FAIL → **Step 3:** 구현 → **Step 4:** PASS, 커밋 `feat(app): 설정 화면`
 
