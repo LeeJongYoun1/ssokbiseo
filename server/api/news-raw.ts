@@ -7,10 +7,11 @@ type Item = { title: string; description: string; link: string; pubDate: string 
 const json = (b: unknown, status = 200) => Response.json(b, { status });
 
 async function search(topic: string): Promise<Item[]> {
-  const res = await fetch(`https://openapi.naver.com/v1/search/news.json?query=${encodeURIComponent(topic)}&display=10&sort=date`, {
+  // NAVER API HUB (옛 개발자센터 openapi.naver.com/v1/search/news.json 과는 키·주소·헤더가 다르다)
+  const res = await fetch(`https://naverapihub.apigw.ntruss.com/search/v1/news?query=${encodeURIComponent(topic)}&display=10&sort=date`, {
     headers: {
-      'X-Naver-Client-Id': process.env.NAVER_CLIENT_ID ?? '',
-      'X-Naver-Client-Secret': process.env.NAVER_CLIENT_SECRET ?? '',
+      'X-NCP-APIGW-API-KEY-ID': process.env.NAVER_CLIENT_ID ?? '',
+      'X-NCP-APIGW-API-KEY': process.env.NAVER_CLIENT_SECRET ?? '',
     },
   });
   if (!res.ok) throw new Error(`naver ${res.status}`);

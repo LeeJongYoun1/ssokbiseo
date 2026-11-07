@@ -11,7 +11,7 @@ Vercel 환경변수(이름만; 값은 저장소에 넣지 않는다):
 
 - `KMA_SERVICE_KEY` — 공공데이터포털 **Decoding** 키
 - `KAKAO_REST_KEY`
-- `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`
+- `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET` — **NAVER API HUB**(네이버 클라우드 플랫폼 콘솔 > NAVER API HUB > Application > 인증 정보)의 Client ID/Secret. 옛 개발자센터(developers.naver.com) 키는 쓸 수 없다.
 - `SSOK_APP_KEY` (앱 요청 헤더 `x-ssok-key`), `SSOK_ROUTINE_KEY` (루틴 요청 헤더 `x-ssok-routine-key`)
 - `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
 

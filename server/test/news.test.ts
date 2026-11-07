@@ -24,7 +24,9 @@ test('주제 12개 모두 키로 있고, 각 display=10&sort=date로 호출', as
   const u = f.mock.calls[0][0];
   expect(u).toContain('display=10');
   expect(u).toContain('sort=date');
-  expect(f.mock.calls[0][1].headers['X-Naver-Client-Id']).toBeDefined();
+  expect(f.mock.calls[0][0]).toContain('https://naverapihub.apigw.ntruss.com/search/v1/news?');
+  expect(f.mock.calls[0][1].headers['X-NCP-APIGW-API-KEY-ID']).toBeDefined();
+  expect(f.mock.calls[0][1].headers['X-NCP-APIGW-API-KEY']).toBeDefined();
   expect(j.topics['경제'][0]).toEqual({ title: '삼성 "반도체"', description: 'd & e', link: 'https://n.news.naver.com/a', pubDate: item.pubDate });
 });
 
