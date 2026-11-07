@@ -13,7 +13,7 @@ Vercel 환경변수(이름만; 값은 저장소에 넣지 않는다):
 - `KAKAO_REST_KEY`
 - `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`
 - `SSOK_APP_KEY` (앱 요청 헤더 `x-ssok-key`), `SSOK_ROUTINE_KEY` (루틴 요청 헤더 `x-ssok-routine-key`)
-- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+- `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` — 하루 호출 횟수 카운터용. 먼저 Supabase SQL Editor에서 `server/supabase/schema.sql`을 한 번 실행한다. 서비스 키(service_role)는 서버 밖으로 내지 않는다.
 
 앱 빌드:
 
