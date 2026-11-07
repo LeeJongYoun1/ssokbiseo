@@ -10,6 +10,10 @@ test('sample passes', () => assert.deepEqual(validateBriefing(sample), []));
 test('empty advice', () => assert.ok(validateBriefing({ ...sample, advice: {} }).some(e => e.includes('advice.good'))));
 test('11 items', () => assert.ok(validateBriefing({ ...sample, news: { 경제: Array(11).fill(item) } }).length > 0));
 test('bad date', () => assert.ok(validateBriefing({ ...sample, date: '2026/11/06' }).length > 0));
+test('stale date rejected only when today given', () => {
+  assert.deepEqual(validateBriefing(sample, sample.date), []);
+  assert.ok(validateBriefing(sample, '2099-01-01').some(e => e.includes('오늘')));
+});
 test('http url path', () => {
   const e = validateBriefing({ ...sample, news: { 경제: [item, item, item, { ...item, url: 'http://x' }] } });
   assert.ok(e.some(m => m.includes('news.경제[3].url')));

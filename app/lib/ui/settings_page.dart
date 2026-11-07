@@ -21,6 +21,23 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   late final Settings _s = widget.store.load(); // moodToday/moodDate는 그대로 보존된다
+  late final String _orig = _s.encode();
+
+  Future<void> _confirmLeave() async {
+    final nav = Navigator.of(context);
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('바꾼 내용을 저장하지 않았어요'),
+        content: const Text('저장하지 않고 나갈까요?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('계속 고치기')),
+          TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('저장 안 하고 나가기')),
+        ],
+      ),
+    );
+    if (leave == true) nav.pop();
+  }
 
   Future<void> _pickPlace(String title, void Function(Place) set) async {
     final p = await Navigator.push<Place>(context,
@@ -49,7 +66,12 @@ class _SettingsPageState extends State<SettingsPage> {
       );
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => PopScope(
+      canPop: _s.encode() == _orig,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _confirmLeave();
+      },
+      child: Scaffold(
         appBar: AppBar(title: const Text('설정')),
         body: ListView(padding: const EdgeInsets.only(bottom: 24), children: [
           CardShell('장소', [
@@ -137,5 +159,5 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Text('저장', style: TextStyle(fontSize: 19)))),
           ),
         ),
-      );
+      ));
 }

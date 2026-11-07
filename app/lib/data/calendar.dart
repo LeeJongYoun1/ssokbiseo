@@ -32,10 +32,14 @@ class DeviceCalendarSource extends CalendarSource {
     // 로컬 자정~다음 자정(로컬 달력 기준 +1일)
     final p = RetrieveEventsParams(
         startDate: at(d0), endDate: at(DateTime(n.year, n.month, n.day + 1)));
-    final cals = (await _p.retrieveCalendars()).data ?? [];
+    // 실패를 빈 목록으로 삼키면 "일정 없음"으로 보이므로 던져서 카드가 오류를 알리게 한다
+    final calRes = await _p.retrieveCalendars();
+    if (!calRes.isSuccess) throw StateError('캘린더 목록 실패');
     final out = <Event>[];
-    for (final c in cals) {
-      out.addAll((await _p.retrieveEvents(c.id, p)).data ?? []);
+    for (final c in calRes.data ?? <Calendar>[]) {
+      final r = await _p.retrieveEvents(c.id, p);
+      if (!r.isSuccess) throw StateError('일정 읽기 실패');
+      out.addAll(r.data ?? []);
     }
     return todayEvents(out, n);
   }

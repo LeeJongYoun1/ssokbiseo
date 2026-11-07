@@ -8,12 +8,14 @@ const str = (v) => typeof v === 'string' && v.trim() !== '';
 const https = (v) => str(v) && v.startsWith('https://');
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-export function validateBriefing(b) {
+// today(YYYY-MM-DD)를 주면 date가 그 날짜인지도 확인한다
+export function validateBriefing(b, today) {
   const errs = [];
   if (!isObj(b)) return ['briefing: 객체가 아닙니다'];
 
   if (typeof b.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(b.date) || isNaN(Date.parse(b.date)))
     errs.push('date: YYYY-MM-DD 형식이어야 합니다');
+  else if (today && b.date !== today) errs.push(`date: 오늘(${today})이 아닙니다: ${b.date}`);
   if (typeof b.generatedAt !== 'string' || isNaN(Date.parse(b.generatedAt)))
     errs.push('generatedAt: ISO 시각 문자열이어야 합니다');
 

@@ -128,6 +128,31 @@ void main() {
     expect(store.load().tone, 'quote');
   });
 
+  testWidgets('바꾼 뒤 뒤로 가면 확인창, 계속 고치기는 머문다, 나가기는 버린다', (t) async {
+    await pump(t, []);
+    await t.tap(find.text('뽐뿌'));
+    await t.pumpAndSettle();
+    await t.pageBack();
+    await t.pumpAndSettle();
+    expect(find.text('바꾼 내용을 저장하지 않았어요'), findsOneWidget);
+    await t.tap(find.text('계속 고치기'));
+    await t.pumpAndSettle();
+    expect(find.byType(SettingsPage), findsOneWidget);
+    await t.pageBack();
+    await t.pumpAndSettle();
+    await t.tap(find.text('저장 안 하고 나가기'));
+    await t.pumpAndSettle();
+    expect(find.byType(SettingsPage), findsNothing);
+    expect(store.load().communities, ['geeknews']);
+  });
+
+  testWidgets('안 바꿨으면 뒤로 가기는 바로 나간다', (t) async {
+    await pump(t, []);
+    await t.pageBack();
+    await t.pumpAndSettle();
+    expect(find.byType(SettingsPage), findsNothing);
+  });
+
   testWidgets('검색 0건 안내', (t) async {
     await pump(t, []);
     await search(t, '집', '없는곳');

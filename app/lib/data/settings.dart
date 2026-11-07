@@ -17,6 +17,18 @@ class Settings {
         communities = communities ?? ['geeknews'],
         taxSources = taxSources ?? ['sejungilbo', 'nts_press', 'nts_notice'],
         channels = channels ?? [];
+
+  String encode() => jsonEncode({
+        'home': home?.toJson(),
+        'work': work?.toJson(),
+        'topics': topics,
+        'communities': communities,
+        'taxSources': taxSources,
+        'tone': tone,
+        'moodToday': moodToday,
+        'moodDate': moodDate,
+        'channels': [for (final c in channels) c.toJson()],
+      });
 }
 
 class SettingsStore {
@@ -51,17 +63,5 @@ class SettingsStore {
     }
   }
 
-  Future<void> save(Settings s) => _p.setString(
-      _k,
-      jsonEncode({
-        'home': s.home?.toJson(),
-        'work': s.work?.toJson(),
-        'topics': s.topics,
-        'communities': s.communities,
-        'taxSources': s.taxSources,
-        'tone': s.tone,
-        'moodToday': s.moodToday,
-        'moodDate': s.moodDate,
-        'channels': [for (final c in s.channels) c.toJson()],
-      }));
+  Future<void> save(Settings s) => _p.setString(_k, s.encode());
 }
